@@ -1,4 +1,4 @@
-﻿const API_ROOT = "http://localhost:3000";
+﻿const API_ROOT = "https://bujji-bajji-production.up.railway.app";
 const ADMIN_EMAIL = "teruanudeep987@gmail.com";
 let itemsData = [];
 let activeFilter = "All";
@@ -1556,7 +1556,7 @@ ${adminExtra}
   </a>
 
   <a
-    href="http://localhost:3000/invoice-pdf/${order._id}"
+    href="https://bujji-bajji-production.up.railway.app/invoice-pdf/${order._id}"
     target="_blank"
     class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-bold text-white">
 
