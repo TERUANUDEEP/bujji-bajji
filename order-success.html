@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Order Successful</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body
+class="min-h-screen flex items-center justify-center text-white">
+
+<video
+autoplay
+muted
+loop
+class="fixed inset-0 w-full h-full object-cover -z-10">
+
+<source
+src="background.mp4"
+type="video/mp4">
+
+</video>
+
+<div
+class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 text-center max-w-lg w-full">
+
+<div class="text-7xl mb-4">
+🎉
+</div>
+
+<h1
+class="text-4xl font-black text-green-400 mb-3">
+Payment Successful
+</h1>
+
+<p
+class="text-gray-300 mb-6">
+Your order has been confirmed.
+</p>
+
+<!-- PAYMENT ID -->
+
+<div class="bg-white/5 rounded-2xl p-4 mb-4">
+
+<p class="text-sm text-gray-300">
+Payment ID
+</p>
+
+<p
+id="paymentId"
+class="font-bold break-all">
+Loading...
+</p>
+
+</div>
+
+<!-- ORDER ID -->
+
+<div class="bg-white/5 rounded-2xl p-4 mb-4">
+
+<p class="text-sm text-gray-300">
+Order ID
+</p>
+
+<p
+id="orderId"
+class="font-bold text-cyan-300">
+Loading...
+</p>
+
+</div>
+
+<!-- PAYMENT METHOD -->
+
+<div class="bg-white/5 rounded-2xl p-4 mb-4">
+
+<p class="text-sm text-gray-300">
+Payment Method
+</p>
+
+<p
+id="paymentMethodText"
+class="font-bold text-yellow-300">
+Loading...
+</p>
+
+</div>
+
+<!-- AMOUNT -->
+
+<div class="bg-white/5 rounded-2xl p-4 mb-4">
+
+<p class="text-sm text-gray-300">
+Amount Paid
+</p>
+
+<p
+id="paidAmount"
+class="font-bold text-green-400 text-xl">
+Loading...
+</p>
+
+</div>
+
+<!-- DELIVERY -->
+
+<div class="bg-white/5 rounded-2xl p-4 mb-6">
+
+<p class="text-sm text-gray-300">
+Estimated Delivery
+</p>
+
+<p class="font-bold">
+20 - 30 Minutes 🚚
+</p>
+
+</div>
+
+<button
+onclick="placeOrderNow()"
+class="w-full bg-green-500 hover:bg-green-600 p-4 rounded-2xl font-bold">
+
+View Order →
+
+</button>
+
+<button
+onclick="downloadInvoice()"
+class="w-full mt-3 bg-blue-500 hover:bg-blue-600 p-4 rounded-2xl font-bold">
+
+🧾 Download Invoice
+
+</button>
+
+<button
+onclick="window.location.href='index.html'"
+class="w-full mt-3 bg-orange-500 hover:bg-orange-600 p-4 rounded-2xl font-bold">
+
+🍽 Continue Shopping
+
+</button>
+
+</div>
+
+<script>
+
+window.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    const paymentId =
+      localStorage.getItem(
+        "paymentId"
+      );
+
+    const orderId =
+      localStorage.getItem(
+        "latestOrderId"
+      );
+
+    const paymentMethod =
+      localStorage.getItem(
+        "lastPaymentMethod"
+      ) ||
+      "Cash On Delivery 💵";
+
+    const total =
+      localStorage.getItem(
+        "lastOrderTotal"
+      ) || 0;
+
+    document.getElementById(
+      "paymentId"
+    ).innerText =
+      paymentId ||
+      "Cash On Delivery";
+
+    document.getElementById(
+      "orderId"
+    ).innerText =
+      orderId
+      ? "#" + orderId.slice(-6)
+      : "N/A";
+
+    document.getElementById(
+      "paymentMethodText"
+    ).innerText =
+      paymentMethod;
+
+    if (
+      paymentMethod.includes(
+        "Cash"
+      )
+    ) {
+
+      document.getElementById(
+        "paidAmount"
+      ).innerText =
+        "Pay On Delivery 💵";
+
+    } else {
+
+      document.getElementById(
+        "paidAmount"
+      ).innerText =
+        `₹${total}`;
+
+    }
+
+  }
+);
+function placeOrderNow() {
+
+  window.location.href =
+    "history.html";
+
+}
+
+async function downloadInvoice() {
+
+  const orderId =
+    localStorage.getItem(
+      "latestOrderId"
+    );
+
+  if (!orderId) {
+
+    showToast(
+      "Invoice unavailable ❌",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const url =
+    `http://localhost:3000/invoice-pdf/${orderId}`;
+
+  window.open(
+    url,
+    "_blank"
+  );
+
+}
+
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+
+</html>

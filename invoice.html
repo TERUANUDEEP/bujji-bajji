@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BUJJI BAJJI Invoice</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body
+class="min-h-screen p-8 bg-gradient-to-br from-[#8b0000] to-[#c1121f]">
+
+<div
+id="invoiceContainer"
+class="max-w-[1600px] mx-auto bg-[#fffaf2] rounded-3xl shadow-2xl overflow-hidden">
+
+<div class="flex justify-between items-start">
+
+  <div class="flex items-center gap-8">
+
+    <img
+    src="logo.png"
+    class="w-40 h-40 object-contain">
+
+    <div>
+
+      <h1
+      class="text-8xl font-black text-red-800 leading-none">
+
+      BUJJI BAJJI
+
+      </h1>
+
+      <p
+      class="text-4xl font-bold text-green-700 mt-3">
+
+      Crispy Outside. Happy Inside.
+
+      </p>
+
+    </div>
+
+  </div>
+
+  <div
+  class="bg-red-700 text-white px-10 py-6 rounded-bl-3xl shadow-xl">
+
+    <h2
+    class="text-4xl font-black">
+
+    INVOICE
+
+    </h2>
+
+  </div>
+
+</div>
+
+<!-- DETAILS SECTION -->
+<div
+class="grid grid-cols-3 gap-8 px-10 pb-10">
+
+<div
+class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+
+<h2
+class="text-2xl font-bold text-red-700 mb-4">
+
+📋 Invoice Details
+
+</h2>
+
+<div id="invoiceDetails"></div>
+
+</div>
+
+<div
+class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+
+<h2
+class="text-2xl font-bold text-red-700 mb-4">
+
+📍 Delivery Details
+
+</h2>
+
+<div id="deliveryDetails"></div>
+
+</div>
+
+<div
+class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px] text-center">
+
+<h2
+class="text-2xl font-bold text-red-700 mb-4">
+
+🔳 Verify Order
+
+</h2>
+
+<img
+src="${verifyQR}"
+width="180"
+height="180"
+/>
+
+<p>
+Order Verification QR
+</p>
+
+<p>
+Scan for order verification
+</p>
+
+</div>
+</div>
+
+<!-- ITEMS -->
+<div class="px-8">
+
+<h2
+class="text-3xl font-black text-red-700 mb-4">
+
+🍽 Items Ordered
+
+</h2>
+
+<table 
+class="w-full table-fixed" overflow-hidden rounded-3xl">
+
+
+
+<thead>
+
+<tr class="bg-red-700 text-white">
+
+<th class="w-16 p-4">#</th>
+
+<th class="w-32 p-4">Image</th>
+
+<th class="p-4 text-left">Item</th>
+
+<th class="w-32 p-4">Price</th>
+
+<th class="w-24 p-4">Qty</th>
+
+<th class="w-32 p-4">Total</th>
+
+</tr>
+
+</thead>
+
+<tbody
+id="itemsTable"
+class="bg-white">
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- SUMMARY -->
+<div
+class="grid grid-cols-2 gap-6 p-8">
+
+<div
+class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+
+<h2
+class="text-2xl font-bold text-red-700 mb-4">
+
+🧾 Order Summary
+
+</h2>
+
+<div id="summaryBox"></div>
+
+</div>
+
+<div
+class="border-2 border-green-300 rounded-3xl p-6">
+
+<h2
+class="text-2xl font-bold text-green-700 mb-4">
+
+🚚 Track Order
+
+</h2>
+
+<div id="trackingBox"></div>
+
+</div>
+
+</div>
+
+<!-- SUPPORT -->
+<div
+class="grid grid-cols-3 gap-6 p-8">
+
+<div
+class="
+bg-white
+border-2
+border-orange-200
+rounded-3xl
+p-6
+shadow-sm"
+>
+<h3 class="font-bold text-green-700 text-xl">
+WhatsApp Support
+</h3>
+
+<a
+href="https://wa.me/919381107534"
+target="_blank"
+rel="noopener noreferrer"
+class="text-lg font-semibold text-green-700 hover:underline">
+
++91 9381107534
+
+</a>
+
+</div>
+
+<div
+class="
+bg-white
+border-2
+border-orange-200
+rounded-3xl
+p-6
+shadow-sm">
+
+<h3 class="font-bold text-red-700 text-xl">
+Email Support
+</h3>
+
+<a
+href="mailto:teruanudeep987@gmail.com"
+class="text-lg font-semibold text-red-700 hover:underline">
+
+teruanudeep987@gmail.com
+
+</a>
+
+</div>
+
+<div
+class="border rounded-2xl p-4 min-h-[220px]">
+
+<h3
+class="font-bold text-orange-700 text-xl">
+
+Feedback QR
+
+</h3>
+
+<div id="feedbackQR"></div>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div
+class="bg-red-800 text-white text-center py-6">
+
+<h2
+class="text-3xl font-bold">
+
+Thank you for choosing BUJJI BAJJI!
+
+</h2>
+
+<p class="mt-2">
+
+Your love keeps us frying 😊
+
+</p>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<script>
+    const API_ROOT =
+"http://localhost:3000";
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const orderIdFromUrl =
+params.get("id");
+
+console.log(
+"ORDER ID FROM URL:",
+orderIdFromUrl
+);
+loadOrderInvoice(
+orderIdFromUrl
+);
+
+// if(orderIdFromUrl){
+
+// loadOrderInvoice(
+// orderIdFromUrl
+// );
+
+// }
+
+const cart =
+JSON.parse(
+localStorage.getItem("cart")
+) || [];
+
+const customer =
+JSON.parse(
+localStorage.getItem("checkoutInfo")
+) || {};
+
+const paymentId =
+localStorage.getItem(
+"paymentId"
+) || "N/A";
+
+let invoiceId =
+localStorage.getItem(
+"invoiceId"
+);
+
+if(!invoiceId){
+
+invoiceId =
+"INV-" + Date.now();
+
+localStorage.setItem(
+"invoiceId",
+invoiceId
+);
+
+}
+
+let orderId =
+localStorage.getItem(
+"orderId"
+);
+
+if(!orderId){
+
+orderId =
+"ORD-" + Date.now();
+
+localStorage.setItem(
+"orderId",
+orderId
+);
+
+}
+let total = 0;
+
+cart.forEach(item=>{
+
+total +=
+item.price * item.qty;
+
+});
+
+document.getElementById(
+"invoiceDetails"
+).innerHTML = `
+<p>
+<b>Invoice ID:</b>
+${invoiceId}
+</p>
+
+<p><b>Order ID:</b> ${orderId}</p>
+<p class="mt-2"><b>Payment ID:</b> ${paymentId}</p>
+<p class="mt-2"><b>Date:</b> ${new Date().toLocaleString()}</p>
+<p class="mt-2">
+<b>Method:</b>
+${localStorage.getItem("paymentMethod") || "UPI"}
+</p>
+<p class="mt-2"><b>Status:</b> 
+    <span
+class="bg-green-600 text-white px-4 py-1 rounded-full font-bold">
+
+PAID ✅
+
+</span>
+</p>
+
+`;
+
+document.getElementById(
+"deliveryDetails"
+).innerHTML = `
+
+<p class="font-bold text-red-700 text-lg">
+${customer.name || "-"}
+</p>
+
+<p class="mt-2">
+${customer.phone || "-"}
+</p>
+
+<p class="mt-2">
+${customer.house || ""},${customer.street || ""}
+</p>
+
+<p>
+${customer.city || ""}
+-
+${customer.pincode || ""}
+</p>
+
+`;
+
+</script>
+<script>
+
+let rows = "";
+
+cart.forEach((item,index)=>{
+
+rows += `
+
+<tr class="border-b h-28">
+
+<td class="p-4 text-center">
+${index+1}
+</td>
+
+<td class="p-4 text-center align-middle">
+  
+<img
+src="${item.img || item.image || 'https://via.placeholder.com/80'}"
+class="w-20 h-20 rounded-xl object-cover mx-auto shadow-md">
+
+</td>
+
+<td class="p-4 text-left">
+
+<div class="flex items-center justify-start">
+
+<span class="font-bold text-2xl text-gray-800">
+${item.name}
+</span>
+
+</div>
+
+</td>
+
+<td class="p-4 text-center">
+₹${item.price}
+</td>
+
+<td class="p-4 text-center">
+${item.qty}
+</td>
+
+<td class="p-4 text-center">
+₹${item.price * item.qty}
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById(
+"itemsTable"
+).innerHTML = rows;
+
+</script>
+<script>
+
+document.getElementById(
+"summaryBox"
+).innerHTML = `
+
+<div class="space-y-3 text-xl">
+
+<div class="flex justify-between">
+<span>Subtotal</span>
+<span>₹${total}</span>
+</div>
+
+<div class="flex justify-between">
+<span>Delivery</span>
+<span>₹0</span>
+</div>
+
+<div class="flex justify-between">
+<span>Discount</span>
+<span>₹0</span>
+</div>
+
+<hr>
+
+<div class="flex justify-between font-black text-3xl text-red-700">
+
+<span>Total</span>
+
+<span>₹${total}</span>
+
+</div>
+
+</div>
+
+`;
+
+</script>
+<script>
+
+document.getElementById(
+"trackingBox"
+).innerHTML = `
+
+<p class="text-lg">
+
+Track your order in real time.
+
+</p>
+
+<a
+id="trackBtn"
+href="#"
+class="block mt-4 bg-green-700 text-white text-center rounded-xl py-3 font-bold">
+
+Track Order
+
+</a>
+
+<p class="mt-4">
+
+Estimated Delivery
+
+</p>
+
+<p
+class="text-3xl font-black text-red-700">
+
+20 - 30 Minutes
+
+</p>
+
+`;
+
+document.getElementById(
+"trackBtn"
+).href =
+`tracking.html?id=${orderId}`;
+
+</script>
+<script>
+
+const verifyData = JSON.stringify({
+
+orderId,
+paymentId,
+
+customer:
+customer.name,
+
+phone:
+customer.phone,
+
+total
+
+});
+
+const box =
+document.getElementById(
+"qrContainer"
+);
+
+QRCode.toCanvas(
+
+verifyData,
+
+{
+width:220
+},
+
+(err,canvas)=>{
+
+if(err) return;
+
+box.innerHTML = "";
+
+box.appendChild(canvas);
+
+const info =
+document.createElement("div");
+
+info.innerHTML = `
+
+<p class="mt-4 font-bold">
+
+Order Verification QR
+
+</p>
+
+<p class="text-sm text-gray-500">
+
+Scan in BUJJI BAJJI App
+
+<p class="text-xs text-gray-500 mt-2">
+For Customer & Delivery Partner Verification
+</p>
+
+</p>
+
+<p class="text-xs mt-2">
+
+${orderId}
+
+</p>
+
+`;
+
+box.appendChild(info);
+
+}
+
+);
+
+</script>
+<script>
+
+QRCode.toCanvas(
+
+"https://wa.me/919381107534",
+
+{
+width:120
+},
+
+(err,canvas)=>{
+
+if(err) return;
+
+document
+.getElementById(
+"feedbackQR"
+)
+.appendChild(
+canvas
+);
+
+}
+
+);
+
+</script>
+
+<script>
+async function loadOrderInvoice(orderId){
+
+    console.log(
+"FUNCTION CALLED"
+);
+
+try{
+
+const res =
+await fetch(
+`${API_ROOT}/order/${orderId}`
+);
+
+const order =
+await res.json();
+
+console.log(
+"Invoice Order:",
+order
+);
+
+}
+catch(err){
+
+console.log(err);
+
+}
+
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+</script>
+ <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>>

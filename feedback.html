@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Feed - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: transparent;
+      opacity: 0;
+      animation: fadeIn 0.4s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .font-brand-title {
+  font-family: 'DIMSUM', 'Arial Black', sans-serif;
+}
+
+.font-section-heading {
+  font-family: 'DM Sans', sans-serif;
+}
+
+
+
+    .glass-card {
+      background: rgba(8,8,8,0.55);
+      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border 0.35s ease, background 0.35s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-10px) scale(1.01);
+      box-shadow: 0 0 45px rgba(255,115,0,0.25);
+      border: 1px solid rgba(255,140,0,0.35);
+    }
+  </style>
+</head>
+
+<body class="bg-transparent text-white overflow-x-hidden">
+
+  <!-- 🎥 Background Video -->
+
+  <video autoplay muted loop preload="auto" class="fixed inset-0 w-full h-full object-cover -z-10 brightness-75">
+    <source src="background.mp4" type="video/mp4">
+  </video>
+
+  <!-- 🌫 Overlay -->
+
+  <div class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-black/50 pointer-events-none -z-10"></div>
+
+  <!-- 🔥 NAVBAR -->
+
+  <header id="topNavbar" class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
+    <div
+class="max-w-7xl mx-auto px-3 py-3
+flex flex-col gap-3
+md:flex-row md:items-center md:justify-between">
+
+      <!-- LEFT: APP NAME & LOGO -->
+
+      <div class="flex items-center gap-3">
+        <img src="logo.png" class="w-14 h-14 rounded-full object-cover border-2 border-orange-400 shadow-xl shadow-orange-500/30">
+        <h1 class="text-3xl font-black uppercase tracking-wider text-orange-400 font-dimsum">BUJJI BAJJI</h1>
+      </div>
+
+      <!-- CENTER: SEARCH & CAMERA -->
+
+      <div class="flex items-center gap-3">
+        <button onclick="window.location.href='feedback.html'" class="text-2xl hover:scale-110 transition" title="Upload feedback">📸</button>
+        <button onclick="window.location.href='favourites.html'" class="text-2xl hover:scale-110 transition" title="Favorites">❤️</button>
+        <div class="relative">
+          <input id="searchInput" type="search" placeholder="Search food..." oninput="filterFeedback()" class="w-64 rounded-full border border-white/20 bg-white/90 px-4 py-2 text-slate-900 outline-none shadow-sm">
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-orange-500">🔎</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: ACCOUNT ICON -->
+
+      <div class="relative">
+        <button onclick="toggleAccountMenu()" class="w-12 h-12 rounded-full bg-orange-500/20 border border-orange-400 flex items-center justify-center text-2xl hover:scale-105 transition" title="Account menu">👤</button>
+        <div id="accountMenu" class="hidden absolute right-0 top-full mt-4 w-72 rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl backdrop-blur-xl text-white z-50">
+          <div class="pb-4 border-b border-white/10">
+            <p class="text-xs uppercase text-slate-400">Signed in as</p>
+            <p id="accountName" class="font-semibold truncate mt-1 text-orange-300">Guest</p>
+            <p id="accountEmail" class="text-xs text-slate-400 truncate"></p>
+          </div>
+          <button onclick="window.location.href='cart.html'" class="w-full mt-3 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">🛒 Cart</button>
+          <button onclick="window.location.href='history.html'" class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">📜 Order History</button>
+          <button onclick="window.location.href='index.html'" class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">🏠 Home</button>
+          <button onclick="logout()" class="mt-4 w-full rounded-2xl bg-orange-500 px-4 py-3 text-black font-semibold hover:bg-orange-600">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 🔥 MAIN CONTENT -->
+
+  <main class="mx-auto max-w-7xl px-4 pb-32 pt-8">
+
+    <!-- UPLOAD SECTION -->
+
+    <section class="mb-12">
+      <h1 class="text-4xl font-black uppercase tracking-wider text-orange-400 mb-6 font-section-heading">📸 Share Your Experience</h1>
+      <div class="glass-card rounded-3xl p-8 border border-white/10 space-y-6">
+        <div>
+          <label class="block text-sm font-semibold mb-2">🧾 Order ID (Optional)</label>
+          <input id="feedbackOrderId" placeholder="Order ID from invoice QR" class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white border border-white/20 focus:border-orange-400 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">🍲 Select Item (Optional)</label>
+          <div class="relative">
+            <input id="feedbackItemSearch" placeholder="Search items..." class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white border border-white/20 focus:border-orange-400 outline-none">
+            <div id="feedbackItemDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-900/95 border border-white/20 rounded-2xl max-h-48 overflow-y-auto z-20 backdrop-blur-xl">
+            </div>
+          </div>
+          <div id="selectedItemDisplay" class="hidden mt-4 p-4 rounded-2xl bg-white/5 border border-orange-400/30 flex gap-3">
+            <img id="selectedItemImage" src="" alt="" class="w-20 h-20 rounded-lg object-cover">
+            <div>
+              <p id="selectedItemName" class="font-semibold text-orange-300"></p>
+              <p id="selectedItemPrice" class="text-sm text-slate-300"></p>
+              <button type="button" onclick="clearSelectedItem()" class="mt-2 text-xs text-orange-400 hover:text-orange-300">Clear selection</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+
+      <input
+        id="feedbackImage"
+        type="file"
+        accept="image/*"
+        title="Upload feedback image"
+        class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white border border-white/20">
+
+      <img
+        id="imagePreview"
+        src=""
+        alt="Preview"
+        class="mt-4 rounded-2xl max-h-48 hidden" />
+
+    </div>
+
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">✍️ Your Experience</label>
+          <textarea id="feedbackText" placeholder="Tell us about your amazing experience with our food! 🌟" class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white border border-white/20 min-h-24 focus:border-orange-400 outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">⭐ Rate This Item</label>
+          <div class="flex gap-3 flex-wrap">
+            <button type="button" onclick="setFeedbackRating(1)" id="rating-1" class="px-4 py-2 rounded-full bg-white/10 text-yellow-300 font-semibold hover:bg-yellow-500/30 transition border border-white/20">1⭐</button>
+            <button type="button" onclick="setFeedbackRating(2)" id="rating-2" class="px-4 py-2 rounded-full bg-white/10 text-yellow-300 font-semibold hover:bg-yellow-500/30 transition border border-white/20">2⭐</button>
+            <button type="button" onclick="setFeedbackRating(3)" id="rating-3" class="px-4 py-2 rounded-full bg-white/10 text-yellow-300 font-semibold hover:bg-yellow-500/30 transition border border-white/20">3⭐</button>
+            <button type="button" onclick="setFeedbackRating(4)" id="rating-4" class="px-4 py-2 rounded-full bg-white/10 text-yellow-300 font-semibold hover:bg-yellow-500/30 transition border border-white/20">4⭐</button>
+            <button type="button" onclick="setFeedbackRating(5)" id="rating-5" class="px-4 py-2 rounded-full bg-white/10 text-yellow-300 font-semibold hover:bg-yellow-500/30 transition border border-white/20">5⭐</button>
+          </div>
+          <p id="ratingDisplay" class="text-xs text-slate-400 mt-2">No rating selected</p>
+        </div>
+
+        <button type="button" onclick="uploadFeedback()" class="w-full rounded-2xl bg-orange-500 px-6 py-3 font-semibold text-black hover:bg-orange-600 transition">🚀 Share Feedback</button>
+      </div>
+    </section>
+
+    <!-- COMMUNITY FEED SECTION -->
+
+    <section>
+      <h2 class="text-3xl font-bold text-orange-400 mb-6">💬 Community Feed</h2>
+
+      <div id="feedbackContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="col-span-full text-center text-slate-300 py-10">Loading community feedback... 📸</div>
+      </div>
+    </section>
+
+    <div id="adminFeedbackPanel"
+     class="hidden mb-12">
+
+  <h2 class="text-3xl font-bold text-red-400 mb-6">
+    🛡 Admin Feedback Panel
+  </h2>
+
+  <div class="glass-card rounded-3xl p-6">
+
+    <p class="text-slate-300 mb-4">
+      Manage all user feedbacks
+    </p>
+
+    <div id="adminFeedbackContainer"
+         class="grid gap-6 md:grid-cols-2">
+    </div>
+
+  </div>
+
+</div>
+    <section class="mb-12">
+  <h2 class="text-3xl font-bold text-green-400 mb-6">
+    📝 My Feedbacks
+  </h2>
+
+  <div
+    id="myFeedbackContainer"
+    class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  </div>
+</section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+
+  <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-white/10 z-40">
+    <div class="max-w-7xl mx-auto flex items-center justify-around px-4 py-3 text-slate-900">
+      <a href="index.html" class="font-bold">🏠 Home</a>
+      <a href="cart.html">🛒 Cart</a>
+      <a href="history.html">📜 History</a>
+      <a href="feedback.html" class="font-bold text-orange-500">📸 Feedback</a>
+      <a href="favourites.html">❤️ Favorites</a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+
+    function protectPage() {
+      let loggedIn = localStorage.getItem("isLoggedIn");
+      if (!loggedIn) {
+        window.location.href = "login.html";
+      }
+    }
+
+    function formatName(name) {
+      if (!name) return "Guest";
+      return name
+        .split(" ")
+        .filter(Boolean)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+    }
+
+    function updateAccountUI() {
+      let email = localStorage.getItem("userEmail") || "";
+      let savedName = localStorage.getItem("userName") || "";
+      let displayName = savedName || email.split("@")[0].replace(/[^a-zA-Z0-9]/g, " ");
+      displayName = formatName(displayName);
+
+      let accountName = document.getElementById("accountName");
+      let accountEmail = document.getElementById("accountEmail");
+
+      if (accountName) accountName.innerText = displayName;
+      if (accountEmail) accountEmail.innerText = email;
+    }
+
+    function toggleAccountMenu() {
+      let menu = document.getElementById("accountMenu");
+      if (!menu) return;
+      menu.classList.toggle("hidden");
+    }
+
+    function hideAccountMenuOnClickOutside(event) {
+      let menu = document.getElementById("accountMenu");
+      let button = event.target.closest("button[onclick='toggleAccountMenu()']");
+      if (!menu || button) return;
+      if (!menu.contains(event.target)) {
+        menu.classList.add("hidden");
+      }
+    }
+
+    async function loadMyFeedbacks() {
+
+  let email =
+    localStorage.getItem(
+      "userEmail"
+    );
+
+  if (!email) return;
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/feedbacks/user/${encodeURIComponent(email)}`
+      );
+
+    let feedbacks =
+      await res.json();
+
+    let container =
+      document.getElementById(
+        "myFeedbackContainer"
+      );
+
+    if (!feedbacks.length) {
+
+      container.innerHTML = `
+        <p class="text-slate-300">
+          No feedbacks yet.
+        </p>
+      `;
+
+      return;
+    }
+
+    container.innerHTML =
+      feedbacks.map(fb => `
+
+      <div class="glass-card rounded-3xl p-6">
+
+        <p class="font-bold text-orange-300">
+          ${fb.itemName || "General Feedback"}
+        </p>
+
+        ${
+          fb.image
+          ? `<img
+              src="${fb.image}"
+              class="w-full h-48 object-cover rounded-2xl mt-3">`
+          : ""
+        }
+
+        <p class="mt-3">
+          ${fb.text}
+        </p>
+
+        <p class="text-yellow-300 mt-2">
+          ⭐ ${fb.rating}/5
+        </p>
+<button
+      onclick="deleteMyFeedback('${fb._id}')"
+      class="mt-4 rounded-xl bg-red-500 px-4 py-2 text-white hover:bg-red-600">
+      🗑 Delete
+    </button>
+<button
+  onclick="editMyFeedback('${fb._id}', '${(fb.text || "").replace(/'/g, "\\'")}', ${fb.rating})"
+  class="mt-2 ml-2 rounded-xl bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+  ✏️ Edit
+</button>
+
+        
+      </div>
+
+      `).join("");
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+}
+
+
+async function deleteMyFeedback(id) {
+
+  if (!confirm("Delete this feedback?")) {
+    return;
+  }
+
+  try {
+
+    let res = await fetch(
+      `${API_ROOT}/feedback/${id}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    let data = await res.json();
+
+    showToast(data.message);
+
+    loadMyFeedbacks();
+    loadFeedback();
+
+  } catch (err) {
+
+    console.log(err);
+
+    showToast("Delete failed ❌");
+
+  }
+
+}
+
+
+async function editMyFeedback(
+  id,
+  currentText,
+  currentRating
+) {
+
+  let newText =
+    prompt(
+      "Edit feedback:",
+      currentText
+    );
+
+  if (
+    newText === null
+  ) return;
+
+  let newRating =
+    prompt(
+      "Rating (1-5):",
+      currentRating
+    );
+
+  if (
+    newRating === null
+  ) return;
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/feedback/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            text: newText,
+            rating: Number(
+              newRating
+            )
+          })
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(
+      data.message
+    );
+
+    loadMyFeedbacks();
+    loadFeedback();
+
+  } catch (err) {
+
+    console.log(err);
+
+    showToast(
+      "Update failed ❌"
+    );
+
+  }
+
+}
+
+async function loadAdminPanel() {
+
+  let role =
+    localStorage.getItem("userRole");
+
+  if (
+    !["admin", "superadmin"]
+      .includes(role)
+  ) {
+    return;
+  }
+
+  document
+    .getElementById(
+      "adminFeedbackPanel"
+    )
+    .classList.remove("hidden");
+
+  loadAllFeedbacksForAdmin();
+}
+
+async function loadAllFeedbacksForAdmin() {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/feedbacks`
+      );
+
+    let feedbacks =
+      await res.json();
+
+    let container =
+      document.getElementById(
+        "adminFeedbackContainer"
+      );
+
+    container.innerHTML =
+      feedbacks.map(fb => `
+
+<div class="rounded-2xl bg-white/5 p-4">
+
+    <p class="font-bold text-orange-300">
+      ${fb.name}
+    </p>
+
+    <p class="text-xs text-slate-400">
+      ${fb.email}
+    </p>
+
+    <p class="text-xs text-slate-500 mt-1">
+      ${fb.createdAt
+        ? new Date(fb.createdAt).toLocaleString()
+        : ""}
+    </p>
+
+    <p class="mt-2 font-semibold text-orange-200">
+      🍽 ${fb.itemName || "General Feedback"}
+    </p>
+
+    ${
+      fb.image
+      ? `
+      <img
+        src="${fb.image}"
+        class="w-full h-40 object-cover rounded-xl mt-3"
+      >
+      `
+      : ""
+    }
+
+    <p class="mt-3">
+      ${fb.text}
+    </p>
+
+    <p class="text-yellow-300 mt-2">
+      ⭐ ${fb.rating}/5
+    </p>
+
+    <p class="text-pink-300 mt-2">
+      ❤️ ${fb.likes || 0}
+    </p>
+
+    <button
+      onclick="adminDeleteFeedback('${fb._id}')"
+      class="mt-4 bg-red-500 px-4 py-2 rounded-xl hover:bg-red-600">
+      🗑 Delete
+    </button>
+
+  </div>
+
+
+      `).join("");
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+
+async function adminDeleteFeedback(id) {
+
+  if (
+    !confirm(
+      "Delete this feedback?"
+    )
+  ) return;
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/feedback/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(
+      data.message
+    );
+
+    loadAllFeedbacksForAdmin();
+    loadFeedback();
+    loadMyFeedbacks();
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userName");
+      window.location.href = "login.html";
+    }
+
+    function showToast(message) {
+      let toast = document.createElement("div");
+      toast.innerText = message;
+      toast.className = "fixed bottom-40 left-1/2 z-50 max-w-xs -translate-x-1/2 rounded-full bg-orange-500 px-5 py-3 text-center text-white shadow-2xl opacity-0 transition-opacity duration-200";
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => { toast.style.opacity = "1"; });
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+      }, 2200);
+    }
+
+    function convertToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadFeedback() {
+      let email = localStorage.getItem("userEmail");
+      if (!email) {
+        showToast("Login first! 😅");
+        return;
+      }
+
+      let fileInput = document.getElementById("feedbackImage");
+      let textInput = document.getElementById("feedbackText");
+   let itemName =
+document.getElementById(
+  "feedbackItemSearch"
+).value.trim();
+      let text = textInput.value.trim();
+      let orderId = document.getElementById("feedbackOrderId").value.trim();
+     
+
+      
+
+
+      if (!fileInput.files.length && !text) {
+        showToast("Add photo or text! 📝");
+        return;
+      }
+
+      if (feedbackRating === 0) {
+        showToast("Please rate the item! ⭐");
+        return;
+      }
+
+      try {
+        let image = "";
+        if (fileInput.files.length) {
+          image = await convertToBase64(fileInput.files[0]);
+        }
+
+        let userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        let name = userData.name || localStorage.getItem("userName") || email.split("@")[0];
+
+        let res = await fetch(`${API_ROOT}/feedback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, image, text, rating: feedbackRating, itemName, orderId })
+        });
+
+        if (res.ok) {
+          showToast("✅ Feedback shared!");
+
+          // Clear form
+          fileInput.value = "";
+          textInput.value = "";
+          document.getElementById("feedbackOrderId").value = "";
+          document.getElementById("feedbackItemSearch").value = "";
+          feedbackRating = 0;
+          document.getElementById("imagePreview").classList.add("hidden");
+          document.getElementById("ratingDisplay").innerText = "No rating selected";
+          document.getElementById("ratingDisplay").classList.add("text-slate-400");
+          document.getElementById("ratingDisplay").classList.remove("text-yellow-300");
+
+          // Reset rating buttons
+          for (let i = 1; i <= 5; i++) {
+            let btn = document.getElementById(`rating-${i}`);
+            if (btn) {
+              btn.classList.add("bg-white/10");
+              btn.classList.remove("bg-yellow-500/40", "border-yellow-400");
+            }
+          }
+
+          // Reload feedback after 500ms
+          setTimeout(() => {
+            loadMyFeedbacks();
+            loadFeedback();
+          }, 500);
+        } else {
+          showToast("Upload failed ❌");
+        }
+      } catch (err) {
+        console.log(err);
+        showToast("Upload failed ❌");
+      }
+    }
+
+    async function loadFeedback() {
+      let container = document.getElementById("feedbackContainer");
+      try {
+        let res = await fetch(`${API_ROOT}/feedbacks`);
+        let feedbacks = await res.json();
+
+        if (!feedbacks || feedbacks.length === 0) {
+          container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-300"><p class="text-xl">No feedback yet 😅</p><p>Be the first to share your experience!</p></div>`;
+          return;
+        }
+
+        container.innerHTML = feedbacks.map(fb => `
+          <div class="glass-card rounded-3xl p-6 border border-white/10 hover:border-orange-400/50 transition space-y-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="font-bold text-orange-300">${fb.name || "Anonymous"}</p>
+                ${fb.itemName ? `<p class="text-xs text-slate-300">About: <span class="text-orange-200">${fb.itemName}</span></p>` : ""}
+                <p class="text-xs text-slate-400">${new Date(fb.createdAt).toLocaleDateString()}</p>
+              </div>
+              <button onclick="likeFeedback('${fb._id}')" class="text-2xl hover:scale-125 transition" id="like-${fb._id}">
+                ${fb.likedBy && fb.likedBy.includes(localStorage.getItem("userEmail")) ? "❤️" : "🤍"}
+              </button>
+            </div>
+
+            ${fb.image ? `<img src="${fb.image}" alt="Feedback" class="w-full rounded-2xl object-cover h-48" onerror="this.src='https://via.placeholder.com/300'">` : ""}
+
+            <p class="text-sm text-slate-200">${fb.text}</p>
+
+            ${fb.rating ? `<p class="text-sm text-yellow-300 font-semibold">⭐ Rating: ${fb.rating}/5</p>` : ""}
+
+            <p class="text-xs text-orange-300 font-semibold">${fb.likes || 0} people loved this ❤️</p>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.log(err);
+        container.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Failed to load feedback ❌</div>`;
+      }
+    }
+
+   async function likeFeedback(id) {
+
+  let email = localStorage.getItem("userEmail");
+
+  if (!email) {
+    showToast("Login first! 😅");
+    return;
+  }
+
+  try {
+
+    let res = await fetch(
+      `${API_ROOT}/feedback/${id}/like`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      }
+    );
+
+    let data = await res.json();
+
+    console.log(data);
+
+    loadFeedback();
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+}
+
+    function filterFeedback() {
+      // Implement filtering logic here if needed
+    }
+
+    let feedbackRating = 0;
+
+    function setFeedbackRating(score) {
+      feedbackRating = score;
+      
+      // Update button highlighting
+      for (let i = 1; i <= 5; i++) {
+        let btn = document.getElementById(`rating-${i}`);
+        if (i <= score) {
+          btn.classList.remove("bg-white/10");
+          btn.classList.add("bg-yellow-500/40", "border-yellow-400");
+        } else {
+          btn.classList.add("bg-white/10");
+          btn.classList.remove("bg-yellow-500/40", "border-yellow-400");
+        }
+      }
+      
+      // Update display text
+      let displayEl = document.getElementById("ratingDisplay");
+      if (displayEl) {
+        displayEl.innerText = `Rating: ${score}/5 stars`;
+        displayEl.classList.remove("text-slate-400");
+        displayEl.classList.add("text-yellow-300");
+      }
+    }
+
+
+
+    document.getElementById("feedbackImage").addEventListener("change", (e) => {
+      if (e.target.files.length) {
+        let reader = new FileReader();
+        reader.onload = (event) => {
+          let preview = document.getElementById("imagePreview");
+          preview.src = event.target.result;
+          preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    let allItems = [];
+    let selectedItemId = null;
+
+    async function loadItemsForFeedback() {
+      try {
+        let res = await fetch(`${API_ROOT}/items`);
+        allItems = await res.json();
+        setupItemSearch();
+      } catch (err) {
+        console.log("Failed to load items", err);
+      }
+    }
+
+    function setupItemSearch() {
+      let searchInput = document.getElementById("feedbackItemSearch");
+      let dropdown = document.getElementById("feedbackItemDropdown");
+
+      searchInput.addEventListener("focus", () => {
+        renderItemDropdown("");
+        dropdown.classList.remove("hidden");
+      });
+
+      searchInput.addEventListener("input", (e) => {
+        let query = e.target.value.toLowerCase();
+        renderItemDropdown(query);
+        if (query) dropdown.classList.remove("hidden");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("#feedbackItemSearch") && !e.target.closest("#feedbackItemDropdown")) {
+          dropdown.classList.add("hidden");
+        }
+      });
+    }
+
+    function renderItemDropdown(query) {
+      let dropdown = document.getElementById("feedbackItemDropdown");
+      let filtered = query ? allItems.filter(item =>
+        item.name.toLowerCase().includes(query) ||
+        item.categories.some(cat => cat.toLowerCase().includes(query))
+      ) : allItems;
+
+      dropdown.innerHTML = filtered.slice(0, 8).map(item => `
+        <div onclick="selectFeedbackItem('${item._id}', '${item.name.replace(/'/g, "\\'")}', '${item.price}', '${item.image.replace(/'/g, "\\'")}')" class="px-4 py-3 cursor-pointer hover:bg-white/10 transition border-b border-white/5 flex items-center gap-3">
+          <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded object-cover">
+          <div class="flex-1">
+            <p class="font-semibold text-white">${item.name}</p>
+            <p class="text-xs text-slate-400">₹${item.price}</p>
+          </div>
+        </div>
+      `).join("");
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = '<div class="px-4 py-3 text-slate-400 text-sm">No items found</div>';
+      }
+    }
+
+    function selectFeedbackItem(itemId, itemName, itemPrice, itemImage) {
+      selectedItemId = itemId;
+      document.getElementById("feedbackItemSearch").value = itemName;
+      document.getElementById("selectedItemName").innerText = itemName;
+      document.getElementById("selectedItemPrice").innerText = `₹${itemPrice}`;
+      document.getElementById("selectedItemImage").src = itemImage;
+      document.getElementById("selectedItemDisplay").classList.remove("hidden");
+      document.getElementById("feedbackItemDropdown").classList.add("hidden");
+      feedbackRating = 0;
+      updateRatingDisplay();
+    }
+
+    function clearSelectedItem() {
+      selectedItemId = null;
+      document.getElementById("feedbackItemSearch").value = "";
+      document.getElementById("selectedItemDisplay").classList.add("hidden");
+      feedbackRating = 0;
+      updateRatingDisplay();
+    }
+
+    function updateRatingDisplay() {
+      let displayEl = document.getElementById("ratingDisplay");
+      if (feedbackRating === 0) {
+        displayEl.innerText = "No rating selected";
+        displayEl.classList.add("text-slate-400");
+        displayEl.classList.remove("text-yellow-300");
+      } else {
+        displayEl.innerText = `Rating: ${feedbackRating}/5 stars`;
+        displayEl.classList.remove("text-slate-400");
+        displayEl.classList.add("text-yellow-300");
+      }
+
+      for (let i = 1; i <= 5; i++) {
+        let btn = document.getElementById(`rating-${i}`);
+        if (i <= feedbackRating) {
+          btn.classList.add("bg-yellow-500/40", "border-yellow-400");
+          btn.classList.remove("bg-white/10");
+        } else {
+          btn.classList.remove("bg-yellow-500/40", "border-yellow-400");
+          btn.classList.add("bg-white/10");
+        }
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const feedbackParams = new URLSearchParams(window.location.search);
+      const linkedOrderId = feedbackParams.get("id");
+      if (linkedOrderId) {
+        document.getElementById("feedbackOrderId").value = linkedOrderId;
+      }
+      loadAdminPanel();
+      protectPage();
+      updateAccountUI();
+      loadMyFeedbacks();
+      loadFeedback();
+      loadItemsForFeedback();
+      document.addEventListener("click", hideAccountMenuOnClickOutside);
+    });
+  </script>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    :root {
+      --brand: #f97316;
+      --brand-strong: #ea580c;
+      --accent: #fb7185;
+      --surface: rgba(15, 23, 42, 0.94);
+      --surface-soft: rgba(15, 23, 42, 0.78);
+      --border: rgba(255,255,255,0.12);
+      --text: #eff6ff;
+      --muted: #cbd5e1;
+    }
+
+    body {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 30;
+      overflow: hidden;
+    }
+
+    .glass-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 90px rgba(15, 23, 42, 0.35);
+    }
+
+    .soft-input {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .soft-input:focus {
+      border-color: rgba(249, 115, 22, 0.9);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    }
+
+    .cta-btn {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .cta-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 40px rgba(249, 115, 22, 0.25);
+    }
+
+    .cta-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .otp-status {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+
+}
+
+.shake {
+
+  animation: shake 0.35s ease;
+
+}
+
+  </style>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body id="loginBody"
+  class="min-h-screen flex items-center justify-center overflow-hidden bg-black relative transition-all duration-1000">
+
+  <!-- ✨ Particle Layer -->
+  <div id="particles" class="fixed inset-0 pointer-events-none z-30"></div>
+
+  <!-- 🌌 Background -->
+  <!-- 🌌 Background -->
+<div class="absolute inset-0 overflow-hidden -z-10">
+
+    <!-- Orange Glow -->
+    <!-- Orange Glow -->
+<div class="absolute top-[-100px] left-[-100px] w-[350px] h-[350px] bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
+
+    <!-- Pink Glow -->
+    <div class="absolute bottom-[-100px] right-[-100px] w-[350px] h-[350px] bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
+
+    <!-- Dark Gradient -->
+    <div class="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black"></div>
+
+  </div>
+
+  <!-- ✨ Login Card -->
+  <div class="relative z-20 w-[90%] max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
+
+    <!-- 🌶️ Brand -->
+    <div class="text-center mb-8">
+
+      <h1 class="text-4xl font-extrabold text-orange-400 tracking-wide">
+
+        🌶️ Bajji Culture
+
+      </h1>
+
+      <p class="text-gray-300 mt-2 text-sm">
+
+        Hot • Crispy • Delivered Fast
+
+      </p>
+
+    </div>
+
+    <!-- 👋 Greeting -->
+    <h2 class="text-2xl font-bold text-center mb-6">
+
+      Welcome Back 👋
+
+    </h2>
+
+    <div id="screenFeedback"
+      class="hidden mx-auto mb-5 max-w-full rounded-3xl border border-orange-400/40 bg-orange-500/10 px-4 py-3 text-center text-sm text-orange-100 shadow-lg backdrop-blur-sm">
+      Message will appear here.
+    </div>
+
+    <!-- 🧑 Full Name -->
+    <div class="relative mb-4">
+      <input
+        id="name"
+        type="text"
+        placeholder="Full Name"
+        onkeypress="handleEnter(event)"
+        class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-400 transition">
+    </div>
+
+    <!-- 📧 Email Wrapper -->
+<div class="relative">
+
+  <!-- 📧 Email -->
+  <input
+    id="email"
+    oninput="clearInvalid('email'); validateEmail()"
+    type="email"
+    placeholder="Enter your email"
+    onkeypress="handleEnter(event)"
+    onclick="showSavedAccounts()"
+    class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-400 transition">
+
+  <!-- ✨ Saved Accounts Dropdown -->
+  <div
+    id="savedAccountsBox"
+   class="hidden absolute top-0 left-full ml-3 w-72 max-h-56 overflow-y-auto bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl z-50"
+
+  </div>
+
+  <div id="emailRules" class="mt-3 text-sm text-gray-300 hidden">
+    <p id="ruleEmailFormat">
+      ❌ Valid email address
+    </p>
+  </div>
+  <p
+  id="emailError"
+  class="hidden text-red-400 text-sm mt-2">
+</p>
+
+</div>
+      <!-- 🔐 Password Rules -->
+<!-- 🔒 Password -->
+<div class="relative mt-4">
+
+  <input
+    id="password"
+    oninput="clearInvalid('password'); validatePassword()"
+    onkeypress="handleEnter(event)"
+    type="password"
+    placeholder="Enter your password"
+    class="w-full p-3 pr-12 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-400 transition">
+
+  <!-- 👁️ Eye -->
+  <button
+    type="button"
+    onclick="togglePassword()"
+    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white">
+
+    👁️
+
+  </button>
+
+</div>
+
+<!-- 🔐 Password Rules -->
+<div id="passwordRules"
+  class="mt-3 text-sm text-gray-300 space-y-1 hidden">
+
+  <p id="ruleLength">
+    ❌ Minimum 8 characters
+  </p>
+
+  <p id="ruleUpper">
+    ❌ One uppercase letter
+  </p>
+
+  <p id="ruleLower">
+    ❌ One lowercase letter
+  </p>
+
+  <p id="ruleNumber">
+    ❌ One number
+  </p>
+
+  <p id="ruleSymbol">
+    ❌ One special symbol
+  </p>
+
+</div>
+<p
+  id="passwordError"
+  class="hidden text-red-400 text-sm mt-2">
+</p>
+
+<p class="text-right mt-2">
+
+  <button
+    onclick="openForgotPassword()"
+    class="text-orange-400 text-sm hover:underline">
+
+    Forgot Password?
+
+  </button>
+
+</p>
+
+
+
+    <!-- 💾 Remember Me -->
+<div class="flex items-center gap-2 mt-4 mb-2 text-sm text-gray-300">
+
+  <input
+    type="checkbox"
+    id="rememberMe"
+    class="accent-orange-500">
+
+  <label for="rememberMe">
+
+    Remember Me
+
+  </label>
+
+</div>
+
+    <!-- 🚀 Login -->
+    <button onclick="loginEmail()"
+      class="w-full bg-orange-500 hover:bg-orange-600 transition-all duration-300 text-white p-3 mt-5 rounded-xl font-bold hover:scale-[1.02] shadow-lg">
+
+      Login
+
+    </button>
+
+    <!-- ✨ Register -->
+    <p class="text-center text-sm text-gray-300 mt-5">
+
+      New here?
+
+      <button onclick="registerUser()"
+        class="text-orange-400 hover:underline font-semibold">
+
+        Create Account
+
+      </button>
+
+    </p>
+
+    <p class="text-center text-sm text-gray-300 mt-3">
+
+      Delivery partner?
+
+      <button onclick="window.location.href='agent-login.html'"
+        class="text-green-300 hover:underline font-semibold">
+
+        Agent Login
+
+      </button>
+
+    </p>
+
+    <!-- Divider -->
+    <div class="flex items-center gap-3 my-6">
+
+      <div class="flex-1 h-[1px] bg-white/20"></div>
+
+      <span class="text-gray-400 text-sm">
+        OR
+      </span>
+
+      <div class="flex-1 h-[1px] bg-white/20"></div>
+
+    </div>
+
+    <!-- 📱 Other Options -->
+    <button onclick="toggleOtherOptions()"
+      class="w-full border border-white/20 hover:bg-white/10 transition p-3 rounded-xl">
+
+      Try Other Options
+
+    </button>
+
+  </div>
+
+  <!-- 📱 OTP Modal -->
+  <div id="otherOptionsModal"
+    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 py-6">
+
+    <div class="glass-card rounded-[32px] p-6 w-full max-w-sm text-white">
+
+      <div class="mb-5 text-center">
+        <h2 class="text-2xl font-bold mb-2">
+          Secure Login Options
+        </h2>
+        <p class="text-sm text-gray-400">
+          Choose email OTP or phone OTP to sign in safely without your password.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <button onclick="sendEmailOTP()"
+          class="cta-btn w-full bg-orange-500 hover:bg-orange-600 p-3 rounded-2xl font-semibold transition mb-2">
+          📧 Send Email OTP
+        </button>
+
+        <div class="space-y-3">
+          <label class="block text-sm text-gray-300">Phone OTP</label>
+          <input id="phone"
+            onkeypress="handleOTPEnter(event)"
+            type="text"
+            placeholder="Enter phone number"
+            class="soft-input w-full p-3 rounded-2xl text-white placeholder-gray-400 outline-none mb-2">
+
+          <button id="sendOtpBtn"
+            onclick="sendOTP()"
+            class="cta-btn w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 p-3 rounded-2xl font-semibold transition">
+            📱 Send OTP
+          </button>
+
+          <div id="recaptcha-container" class="hidden"></div>
+
+          <p id="otpHint" class="otp-status mb-1">
+            Enter your number and tap Send OTP.
+          </p>
+        </div>
+      </div>
+
+      <div id="otpSection" class="hidden mt-5 space-y-4 rounded-3xl bg-white/5 p-4 border border-white/10">
+        <div class="flex items-center justify-between gap-3 text-sm text-gray-300">
+          <span class="font-medium">OTP sent</span>
+          <span id="otpCountdown" class="text-gray-400">Waiting for code</span>
+        </div>
+
+        <input
+          id="commonOtp"
+          type="text"
+          placeholder="Enter OTP"
+          onkeypress="handleOTPEnter(event)"
+          class="soft-input w-full p-3 rounded-2xl text-white placeholder-gray-400 outline-none mb-2">
+
+        <button id="verifyOtpBtn"
+          onclick="verifyCommonOTP()"
+          class="cta-btn w-full bg-blue-500 hover:bg-blue-600 p-3 rounded-2xl font-semibold transition">
+          Verify OTP
+        </button>
+
+        <button id="resendOtpBtn"
+          onclick="resendOTP()"
+          class="hidden w-full text-sm text-orange-300 hover:text-orange-100 transition">
+          Resend code
+        </button>
+      </div>
+
+      <button onclick="toggleOtherOptions()"
+        class="w-full mt-5 text-gray-400 hover:text-white transition">
+        Close
+      </button>
+
+     <!-- 🔑 Reset Password Section -->
+<div
+  id="resetPasswordSection"
+  class="hidden relative mt-4">
+
+  <!-- 🔐 Reset Password Rules -->
+<div id="resetPasswordRules"
+  class="mt-3 text-sm text-gray-300 space-y-1 hidden">
+
+  <p id="resetRuleLength">
+    ❌ Minimum 8 characters
+  </p>
+
+  <p id="resetRuleUpper">
+    ❌ One uppercase letter
+  </p>
+
+  <p id="resetRuleLower">
+    ❌ One lowercase letter
+  </p>
+
+  <p id="resetRuleNumber">
+    ❌ One number
+  </p>
+
+  <p id="resetRuleSymbol">
+    ❌ One special symbol
+  </p>
+
+</div>
+
+<div class="relative mt-3">
+  <!-- 🔑 New Password -->
+  <input
+    id="newPassword"
+     oninput="validateResetPassword()"
+    type="password"
+    placeholder="Enter New Password"
+    class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-orange-400 transition">
+
+  <!-- 👁️ Eye -->
+   <!-- 👁️ Reset Password Eye -->
+  <button
+    type="button"
+    onclick="toggleNewPassword()"
+    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white">
+
+    👁️
+
+  </button>
+
+</div>
+
+
+
+<!-- 🚀 Reset Password -->
+<button
+  id="resetPasswordBtn"
+  onclick="resetPassword()"
+  class="w-full bg-orange-500 hover:bg-orange-600 p-3 rounded-xl mt-4">
+
+  Reset Password
+
+</button>
+
+      
+
+    </div>
+
+  </div>
+
+ <script>
+
+  // =========================
+  // 🔑 REAL LOGIN
+  // =========================
+async function loginEmail() {
+
+  let email =
+    document.getElementById("email").value.trim();
+
+  let password =
+    document.getElementById("password").value;
+
+  // ❌ Empty Fields
+  if (!email || !password) {
+
+    // 📧 Email Empty
+    if (!email) {
+
+      markInvalid("email");
+
+      showFieldError(
+        "emailError",
+        "Email is required"
+      );
+
+    }
+
+    else {
+
+      clearInvalid("email");
+
+      hideFieldError("emailError");
+
+    }
+
+    // 🔒 Password Empty
+    if (!password) {
+
+      markInvalid("password");
+
+      showFieldError(
+        "passwordError",
+        "Password is required"
+      );
+
+    }
+
+    else {
+
+      clearInvalid("password");
+
+      hideFieldError("passwordError");
+
+    }
+
+    showToast(
+      "Please fill all fields"
+    );
+
+    return;
+
+  }
+
+  // ✅ Clear Old Errors
+  clearInvalid("email");
+  clearInvalid("password");
+
+  hideFieldError("emailError");
+  hideFieldError("passwordError");
+
+  try {
+
+    let res = await fetch(
+
+      "http://localhost:3000/login",
+
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          email,
+          password
+        })
+
+      }
+
+    );
+
+    let data = await res.json();
+
+    // ✅ LOGIN SUCCESS
+    if (res.ok) {
+
+      // 💾 Save Multiple Accounts
+      let savedAccounts =
+        JSON.parse(
+          localStorage.getItem("savedAccounts") || "[]"
+        );
+
+      if (!savedAccounts.includes(email)) {
+
+        savedAccounts.push(email);
+
+        localStorage.setItem(
+
+          "savedAccounts",
+
+          JSON.stringify(savedAccounts)
+
+        );
+
+      }
+
+      // ✨ Keep particles flowing
+      let particleInterval = setInterval(() => {
+
+        createParticles("fast");
+
+      }, 120);
+
+      // 🌫️ Cinematic dissolve
+      let body =
+        document.getElementById("loginBody");
+
+      body.style.filter =
+        "blur(6px) brightness(0.7) saturate(0.7)";
+
+      body.style.transform =
+        "scale(1.03)";
+
+      body.style.opacity =
+        "0.85";
+
+      // ✨ Glass glow effect
+      document.querySelectorAll(
+        ".backdrop-blur-2xl"
+      ).forEach(card => {
+
+        card.style.boxShadow =
+          "0 0 80px rgba(249,115,22,0.35)";
+
+      });
+
+      // 💾 Save Session
+      localStorage.setItem(
+        "isLoggedIn",
+        "true"
+      );
+
+      localStorage.setItem(
+        "userEmail",
+        data.email
+      );
+
+      localStorage.setItem(
+        "userName",
+        data.name || data.email.split("@")[0]
+      );
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      // 💾 Remember Me
+      let rememberMe =
+        document.getElementById("rememberMe");
+
+      if (rememberMe.checked) {
+
+        localStorage.setItem(
+          "rememberedLogin",
+          "true"
+        );
+
+      }
+
+      // 👑 Admin Role
+      if (
+        data.email ===
+        "teruanudeep987@gmail.com"
+      ) {
+
+        localStorage.setItem(
+          "role",
+          "admin"
+        );
+
+      }
+
+      else {
+
+        localStorage.setItem(
+          "role",
+          "user"
+        );
+
+      }
+
+      showToast(
+        "Login successful ✅"
+      );
+
+      // 🚀 Redirect
+      setTimeout(() => {
+
+        clearInterval(
+          particleInterval
+        );
+
+        window.location.href =
+          "index.html";
+
+      }, 850);
+
+    }
+
+    // ❌ LOGIN FAILED
+    else {
+
+      let message =
+        data && typeof data.message === "string"
+          ? data.message
+          : "Login failed";
+
+      const msg = message.toLowerCase();
+
+      // ❌ No User Found, register first
+      if (
+
+        msg.includes("user") ||
+
+        msg.includes("email")
+
+      ) {
+
+        message = "No user found. Please register first.";
+
+        markInvalid("email");
+
+        showFieldError(
+
+          "emailError",
+
+          message
+
+        );
+
+      }
+
+      // ❌ Wrong Password
+      else if (
+
+        msg.includes("password")
+
+      ) {
+
+        markInvalid("password");
+
+        showFieldError(
+
+          "passwordError",
+
+          "Password is incorrect"
+
+        );
+
+      } else {
+
+        showFieldError(
+
+          "emailError",
+
+          message
+
+        );
+
+      }
+
+      showToast(message);
+
+    }
+
+  }
+
+  catch (err) {
+
+    console.log(err);
+
+    showToast(
+      "Server error ❌"
+    );
+
+  }
+
+}
+
+
+  // =========================
+  // 👤 REGISTER
+  // =========================
+  async function registerUser() {
+
+    let name =
+      document.getElementById("name").value.trim();
+
+    let email =
+      document.getElementById("email").value.trim();
+
+    let password =
+      document.getElementById("password").value;
+
+    if (!name || !email || !password) {
+
+      showToast("Enter name, email & password");
+
+      return;
+    }
+// 🔐 Strong Password Validation
+let strongPassword =
+
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+if (!strongPassword.test(password)) {
+
+  showToast(
+
+    "Use uppercase, lowercase, number & symbol"
+
+  );
+
+  return;
+
+}
+    
+    try {
+
+      let res = await fetch("http://localhost:3000/register", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          name,
+          email,
+          password
+        })
+
+      });
+
+      let data = await res.json();
+
+      showToast(data.message);
+
+    }
+
+    catch (err) {
+
+      console.log(err);
+
+    showToast("Registration failed ❌");
+
+    }
+
+  }
+
+
+async function sendEmailOTP() {
+
+  let email =
+    document.getElementById("email").value.trim();
+
+  if (!email) {
+
+    showToast("Enter email first");
+
+    return;
+
+  }
+
+  localStorage.setItem(
+    "otpMode",
+    "email"
+  );
+
+  localStorage.setItem(
+    "otpTarget",
+    email.toLowerCase()
+  );
+
+  try {
+
+    let res = await fetch(
+      "http://localhost:3000/send-email-otp",
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          email
+        })
+
+      }
+    );
+
+    let data = await res.json();
+
+    if (data.success) {
+      showToast("OTP sent to email 📧");
+      document
+        .getElementById("otpSection")
+        .classList.remove("hidden");
+    } else {
+      showToast("Failed to send OTP ❌");
+    }
+
+  }
+
+  catch {
+
+    showToast("Failed to send OTP ❌");
+
+  }
+
+}
+
+  // 🔑 Reset Password
+async function resetPassword() {
+
+  let email =
+    document.getElementById("email").value.trim();
+
+  let newPassword =
+    document.getElementById("newPassword").value;
+
+  if (!email) {
+    showToast("Enter your email before resetting");
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast("Enter a valid email address");
+    return;
+  }
+
+  if (!newPassword) {
+
+    showToast("Enter new password");
+
+    return;
+
+  }
+
+  try {
+
+    let res = await fetch(
+
+      "http://localhost:3000/reset-password",
+
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          email,
+
+          newPassword
+
+        })
+
+      }
+
+    );
+
+    let data = await res.json();
+
+    if (data.success) {
+      showToast(`Your password is changed to ${newPassword}`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } else {
+      showToast(data.message);
+    }
+
+  }
+
+  catch (err) {
+
+    console.log(err);
+
+    showToast("Reset failed ❌");
+
+  }
+
+}
+
+  async function verifyCommonOTP() {
+
+  let mode =
+    localStorage.getItem("otpMode");
+
+  let otp =
+    document.getElementById("commonOtp").value;
+
+  // 📧 EMAIL OTP
+  if (mode === "email") {
+
+    let email =
+      localStorage.getItem("otpTarget") ||
+      document.getElementById("email").value;
+
+    let res = await fetch(
+      "http://localhost:3000/verify-email-otp",
+      {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          email: email.trim(),
+          otp: otp.trim()
+        })
+
+      }
+    );
+
+    let data = await res.json();
+
+    if (data.success) {
+
+      showToast("OTP Verified ✅");
+
+      localStorage.removeItem("otpTarget");
+      showResetSection();
+
+    }
+
+    else {
+
+      showToast("Invalid OTP ❌");
+
+    }
+
+  }
+
+  // 📱 PHONE OTP
+  else if (mode === "phone") {
+
+  let success =
+    await verifyPhoneOTP(otp);
+
+  if (success) {
+
+    showToast("OTP Verified ✅");
+
+    localStorage.removeItem("otpTarget");
+    showResetSection();
+
+  }
+
+  else {
+
+    showToast("Invalid OTP ❌");
+
+  }
+
+}
+  }
+
+
+function showResetSection() {
+
+  document
+    .getElementById("resetPasswordSection")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("resetPasswordBtn")
+    .classList.remove("hidden");
+
+}
+
+
+
+// 📱 Toggle Other Options Modal
+function toggleOtherOptions() {
+
+  let modal =
+    document.getElementById("otherOptionsModal");
+
+  modal.classList.toggle("hidden");
+
+}
+
+// 🔑 Open Forgot Password
+function openForgotPassword() {
+
+  let modal =
+    document.getElementById("otherOptionsModal");
+
+  modal.classList.remove("hidden");
+
+}
+
+// 👁️ Toggle Password
+function togglePassword() {
+
+  let password =
+    document.getElementById("password");
+
+  if (password.type === "password") {
+
+    password.type = "text";
+
+  }
+
+  else {
+
+    password.type = "password";
+
+  }
+
+}
+
+
+// 👁️ Toggle New Password
+function toggleNewPassword() {
+
+  let password =
+    document.getElementById("newPassword");
+
+  if (password.type === "password") {
+
+    password.type = "text";
+
+  }
+
+  else {
+
+    password.type = "password";
+
+  }
+
+}
+
+
+// ✨ Real App Cinematic Particles
+function createParticles(speed = "normal") {
+
+  let container =
+    document.getElementById("particles");
+
+  if (!container) return;
+
+  // 🌌 Minimal Premium Density
+  let particleCount =
+    speed === "fast" ? 40 : 8;
+
+  for (let i = 0; i < particleCount; i++) {
+
+    let particle =
+      document.createElement("div");
+
+    particle.className =
+      "absolute rounded-full";
+
+    // 🌟 Small Elegant Particles
+    let size =
+  Math.random() * 5 + 2;
+
+    particle.style.width =
+      size + "px";
+
+    particle.style.height =
+      size + "px";
+
+    // 🎨 Cinematic Warm Colors
+    let colors = [
+      "#f97316",
+      "#fb7185",
+      "#fdba74",
+      "#ffffff"
+    ];
+
+    let color =
+      colors[Math.floor(
+        Math.random() * colors.length
+      )];
+
+    particle.style.background =
+      color;
+
+      particle.style.opacity =
+  Math.random() * 0.7 + 0.3;
+
+    // ✨ Soft Glow
+    particle.style.boxShadow =
+      `0 0 25px ${color}`;
+
+    // 🌌 True Fullscreen + Edge Spawn
+    let edgePadding = 120;
+
+    let startX =
+      Math.random() *
+      (window.innerWidth + edgePadding * 2)
+
+      - edgePadding;
+
+    let startY =
+      Math.random() *
+      (window.innerHeight + edgePadding * 2)
+
+      - edgePadding;
+
+    // 📍 Apply Position
+    particle.style.left =
+      startX + "px";
+
+    particle.style.top =
+      startY + "px";
+
+    // ✨ Add To Screen
+    container.appendChild(particle);
+
+    // 🌌 Balanced Natural Drift
+    let directionX =
+      Math.random() < 0.5 ? -1 : 1;
+
+    let moveX1 =
+      directionX *
+      (Math.random() * 250 + 100);
+
+    let moveY1 =
+      (Math.random() - 0.5) * 250;
+
+    let moveX2 =
+      directionX *
+      (Math.random() * 400 + 200);
+
+    let moveY2 =
+      (Math.random() - 0.5) * 400;
+
+    // 🎞️ Smooth Cinematic Animation
+    particle.animate(
+
+      [
+
+        {
+          transform:
+            "translate(0px,0px) scale(1)",
+          opacity: 0
+        },
+
+        {
+          transform:
+            `translate(${moveX1}px, ${moveY1}px) scale(1.1)`,
+          opacity: 1,
+          offset: 0.4
+        },
+
+        {
+          transform:
+            `translate(${moveX2}px, ${moveY2}px) scale(0.2)`,
+          opacity: 0
+        }
+
+      ],
+
+      {
+
+        duration:
+          speed === "fast"
+            ? Math.random() * 1800 + 1200
+            : Math.random() * 6000 + 5000,
+
+        easing: "ease-in-out"
+
+      }
+
+    );
+
+    // 🧹 Cleanup
+    setTimeout(() => {
+
+      particle.remove();
+
+    },
+
+    speed === "fast"
+      ? 2500
+      : 11000);
+
+  }
+
+}
+
+
+// 🌌 Ambient Particles
+window.addEventListener("load", () => {
+
+  // 🚀 Auto Login
+  let remembered =
+  localStorage.getItem("rememberedLogin");
+
+let token =
+  localStorage.getItem("token");
+
+let loggedIn =
+  localStorage.getItem("isLoggedIn");
+
+if (
+  remembered === "true" &&
+  token &&
+  loggedIn === "true"
+) {
+
+  window.location.href =
+    "index.html";
+
+}
+
+  // ✨ Smooth Ambient Generation
+  createParticles();
+
+  setInterval(() => {
+
+    createParticles();
+
+  }, 900);
+
+});
+
+// 🔔 Premium Toast
+function showToast(message) {
+
+  let toast =
+    document.getElementById("toast");
+
+  let toastMessage =
+    document.getElementById("toastMessage");
+
+  let screenFeedback =
+    document.getElementById("screenFeedback");
+
+  toastMessage.innerText =
+    message;
+
+  toast.style.display = "block";
+  toast.style.opacity = "1";
+  toast.style.transform =
+    "translateY(0px)";
+  toast.style.visibility = "visible";
+
+  if (screenFeedback) {
+    screenFeedback.innerText = message;
+    screenFeedback.classList.remove("hidden");
+    screenFeedback.style.display = "block";
+    screenFeedback.style.opacity = "1";
+  }
+
+  setTimeout(() => {
+
+    toast.style.opacity = "0";
+    toast.style.transform =
+      "translateY(20px)";
+
+    if (screenFeedback) {
+      screenFeedback.style.opacity = "0";
+    }
+
+  }, 2200);
+
+  setTimeout(() => {
+
+    toast.style.display = "none";
+    toast.style.visibility = "hidden";
+    if (screenFeedback) {
+      screenFeedback.classList.add("hidden");
+      screenFeedback.style.display = "none";
+      screenFeedback.style.opacity = "1";
+    }
+
+  }, 2600);
+
+}
+
+function markInvalid(id) {
+
+  let input =
+    document.getElementById(id);
+
+  if (!input) return;
+
+  input.classList.add(
+    "border-red-500",
+    "ring-2",
+    "ring-red-500/40",
+    "shake"
+  );
+
+  // 🔄 Restart animation
+  input.addEventListener(
+    "animationend",
+    () => {
+
+      input.classList.remove("shake");
+
+    },
+
+    { once: true }
+
+  );
+
+}
+// ✅ Clear Invalid State
+function clearInvalid(id) {
+
+  let input =
+    document.getElementById(id);
+
+  if (!input) return;
+
+  input.classList.remove(
+    "border-red-500",
+    "ring-2",
+    "ring-red-500/40"
+  );
+
+}
+
+// ❌ Show Error Message
+function showFieldError(id, message) {
+
+  let error =
+    document.getElementById(id);
+
+  if (!error) return;
+
+  error.innerText =
+    message;
+
+  error.classList.remove("hidden");
+
+}
+
+// ✅ Hide Error Message
+function hideFieldError(id) {
+
+  let error =
+    document.getElementById(id);
+
+  if (!error) return;
+
+  error.classList.add("hidden");
+
+}
+
+// ⌨️ Enter Key Login
+function handleEnter(event) {
+
+  if (event.key === "Enter") {
+
+    // 📱 Modal Open
+    let modal =
+      document.getElementById("otherOptionsModal");
+
+    if (!modal.classList.contains("hidden")) {
+
+      let otpSection =
+        document.getElementById("otpSection");
+
+      // 🔐 OTP visible → verify
+      if (!otpSection.classList.contains("hidden")) {
+
+        verifyCommonOTP();
+       
+      }
+
+      // 📱 Phone exists → send phone OTP
+      else {
+
+        let phone =
+          document.getElementById("phone").value;
+
+        if (phone.length >= 10) {
+
+          sendOTP();
+
+        }
+
+        // 📧 Otherwise email OTP
+        else {
+
+          sendEmailOTP();
+
+        }
+
+      }
+
+    }
+
+    // 🔑 Normal login
+    else {
+
+      loginEmail();
+
+    }
+
+  }
+
+}
+
+function handleOTPEnter(event) {
+
+  if (event.key === "Enter") {
+
+    let otpSection =
+      document.getElementById("otpSection");
+
+    // OTP visible → verify
+    if (!otpSection.classList.contains("hidden")) {
+
+      verifyCommonOTP();
+
+    }
+
+    // Email exists → send email OTP
+    else {
+
+      let phone =
+        document.getElementById("phone").value;
+
+      if (phone.length >= 10) {
+
+        sendOTP();
+
+      }
+
+      else {
+
+        sendEmailOTP();
+
+      }
+
+    }
+
+  }
+
+}
+
+
+// 🔐 Live Password Validation
+function validatePassword() {
+
+  let password =
+    document.getElementById("password").value;
+
+  let rules =
+    document.getElementById("passwordRules");
+
+  rules.classList.remove("hidden");
+
+  // 📏 Length
+  updateRule(
+    "ruleLength",
+    password.length >= 8
+  );
+
+  // 🔠 Uppercase
+  updateRule(
+    "ruleUpper",
+    /[A-Z]/.test(password)
+  );
+
+  // 🔡 Lowercase
+  updateRule(
+    "ruleLower",
+    /[a-z]/.test(password)
+  );
+
+  // 🔢 Number
+  updateRule(
+    "ruleNumber",
+    /\d/.test(password)
+  );
+
+  // ✨ Symbol
+  updateRule(
+    "ruleSymbol",
+    /[@$!%*?&]/.test(password)
+  );
+
+}
+
+// 🔐 Validate Reset Password
+function validateResetPassword() {
+
+  let password =
+    document
+      .getElementById("newPassword")
+      .value;
+
+  let rules =
+    document
+      .getElementById("resetPasswordRules");
+
+  rules.classList.remove("hidden");
+
+  // 📏 Length
+  updateRule(
+    "resetRuleLength",
+    password.length >= 8
+  );
+
+  // 🔠 Uppercase
+  updateRule(
+    "resetRuleUpper",
+    /[A-Z]/.test(password)
+  );
+
+  // 🔡 Lowercase
+  updateRule(
+    "resetRuleLower",
+    /[a-z]/.test(password)
+  );
+
+  // 🔢 Number
+  updateRule(
+    "resetRuleNumber",
+    /\d/.test(password)
+  );
+
+  // ✨ Symbol
+  updateRule(
+    "resetRuleSymbol",
+    /[@$!%*?&]/.test(password)
+  );
+
+}
+
+// ✨ Update Rule UI
+function updateRule(id, valid) {
+
+  let el =
+    document.getElementById(id);
+
+  if (valid) {
+
+    el.innerHTML =
+      "✅ " + el.innerHTML.substring(2);
+
+    el.classList.add("text-green-400");
+
+    el.classList.remove("text-red-400");
+
+  }
+
+  else {
+
+    el.innerHTML =
+      "❌ " + el.innerHTML.substring(2);
+
+    el.classList.add("text-red-400");
+
+    el.classList.remove("text-green-400");
+
+  }
+
+}
+
+function validateEmail() {
+  let email = document.getElementById("email").value.trim();
+  let rules = document.getElementById("emailRules");
+  
+  // Hide rules if email is empty
+  if (!email) {
+    rules.classList.add("hidden");
+    return;
+  }
+  
+  // More comprehensive email validation
+  let isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  let hasValidDomain = /\.[a-zA-Z]{2,}$/.test(email);
+  let noSpecialChars = !/[<>()[\]\\,;:\s@"]/.test(email);
+  
+  rules.classList.remove("hidden");
+  updateRule("ruleEmailFormat", isValid && hasValidDomain && noSpecialChars);
+}
+
+// 📧 Show Saved Accounts
+function showSavedAccounts() {
+
+  let box =
+    document.getElementById("savedAccountsBox");
+
+  let savedAccounts =
+
+    JSON.parse(
+      localStorage.getItem("savedAccounts")
+    ) || [];
+
+  // ❌ Empty
+  if (savedAccounts.length === 0) {
+
+    box.classList.add("hidden");
+
+    return;
+
+  }
+
+  box.innerHTML = "";
+
+  savedAccounts.forEach(email => {
+
+    box.innerHTML += `
+
+      <div
+        onclick="selectAccount('${email}')"
+        class="p-3 hover:bg-white/10 cursor-pointer border-b border-white/10 transition">
+
+        📧 ${email}
+
+      </div>
+
+    `;
+
+  });
+
+  box.classList.remove("hidden");
+
+}
+
+
+// ✨ Select Account
+function selectAccount(email) {
+
+  document.getElementById("email").value =
+    email;
+
+  document.getElementById("savedAccountsBox")
+    .classList.add("hidden");
+
+}
+
+
+// 🌌 Close Dropdown Outside Click
+document.addEventListener("click", (e) => {
+
+  let box =
+    document.getElementById("savedAccountsBox");
+
+  let emailInput =
+    document.getElementById("email");
+
+  if (
+
+    !box.contains(e.target) &&
+
+    e.target !== emailInput
+
+  ) {
+
+    box.classList.add("hidden");
+
+  }
+
+});
+
+
+</script>
+<!-- 🔔 Toast -->
+<div id="toast"
+  class="fixed bottom-5 right-5 z-[100] pointer-events-none"
+  style="display: none; opacity: 0; visibility: hidden; transform: translateY(20px); transition: opacity 0.25s ease, transform 0.25s ease;">
+
+  <div id="toastMessage"
+    class="bg-orange-500/95 border border-white/20 text-white px-5 py-3 rounded-2xl shadow-2xl text-sm pointer-events-auto">
+
+    Toast Message
+
+  </div>
+
+</div>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import {
+    getAuth,
+    RecaptchaVerifier,
+    signInWithPhoneNumber
+  } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAO_huwJ5uATLCdmmHji1skQjVwP516JuI",
+    authDomain: "bujji-bajji.firebaseapp.com",
+    projectId: "bujji-bajji",
+    storageBucket: "bujji-bajji.firebasestorage.app",
+    messagingSenderId: "522406439307",
+    appId: "1:522406439307:web:914d5b2ea8981a1ba5e78e",
+    measurementId: "G-3JF7NVGT29"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  window.auth = auth;
+
+  try {
+    const container = document.getElementById('recaptcha-container');
+    if (!container) {
+      throw new Error('Recaptcha container not found,register');
+    }
+
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      container,
+      { size: 'invisible' },
+      auth
+    );
+
+    window.recaptchaVerifier.render().catch(err => {
+      console.log('Recaptcha render error:', err);
+    });
+  } catch (err) {
+    console.log('Recaptcha init error:', err);
+  }
+
+  window.sendOTP = async function () {
+    const phoneValue = document.getElementById("phone").value.trim();
+    const otpHint = document.getElementById("otpHint");
+    const sendBtn = document.getElementById("sendOtpBtn");
+    const countdown = document.getElementById("otpCountdown");
+
+    if (!phoneValue) {
+      showToast("Enter phone number first");
+      return;
+    }
+
+    if (!window.recaptchaVerifier) {
+      showToast("Recaptcha not ready, refresh the page");
+      return;
+    }
+
+    sendBtn.disabled = true;
+    sendBtn.innerText = "Sending...";
+    otpHint.textContent = "Sending OTP, please wait...";
+    countdown.textContent = "Preparing SMS";
+
+    // Extract only digits from phone number
+    let normalized = phoneValue.replace(/\D/g, "");
+
+    // Handle Indian numbers (10 digits)
+    if (normalized.length === 10) {
+      normalized = "+91" + normalized;
+    } 
+    // Handle numbers starting with +91 (already formatted)
+    else if (normalized.length === 12 && phoneValue.startsWith("+91")) {
+      normalized = "+" + normalized;
+    }
+    // Handle US numbers (1 + 10 digits = 11)
+    else if (normalized.length === 11 && normalized.startsWith("1")) {
+      normalized = "+" + normalized;
+    } 
+    // Handle numbers without country code
+    else if (!normalized.startsWith("91") && !normalized.startsWith("1") && normalized.length >= 10) {
+      // Default to India if not US
+      if (normalized.length === 10) {
+        normalized = "+91" + normalized;
+      } else {
+        normalized = "+" + normalized;
+      }
+    }
+    // Ensure country code prefix
+    else if (!normalized.startsWith("+") && normalized.length >= 10) {
+      normalized = "+91" + normalized.slice(-10);
+    }
+
+    try {
+      const confirmationResult = await signInWithPhoneNumber(
+        window.auth,
+        normalized,
+        window.recaptchaVerifier
+      );
+
+      window.confirmationResult = confirmationResult;
+      localStorage.setItem("otpMode", "phone");
+      localStorage.setItem("otpTarget", phoneValue);
+      document.getElementById("otpSection").classList.remove("hidden");
+      document.getElementById("resendOtpBtn").classList.remove("hidden");
+      sendBtn.disabled = false;
+      sendBtn.innerText = "📱 Send OTP";
+      sendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      otpHint.textContent = "OTP sent — enter the code below.";
+      countdown.textContent = "Code on its way";
+      showToast("OTP sent to phone 📱");
+    } catch (err) {
+      console.log("Firebase phone OTP error:", err);
+      const code = err && err.code ? err.code : null;
+      sendBtn.disabled = false;
+      sendBtn.innerText = "📱 Send OTP";
+      otpHint.textContent = "Check the phone number and try again.";
+
+      if (code === 'auth/too-many-requests' || code === 'auth/quota-exceeded') {
+        showToast("Too many requests. Try again later.");
+
+        sendBtn.disabled = true;
+        sendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        const origText = sendBtn.innerText;
+        let wait = 60;
+        sendBtn.innerText = `Wait ${wait}s`;
+        const t = setInterval(() => {
+          wait -= 1;
+          if (wait <= 0) {
+            clearInterval(t);
+            sendBtn.disabled = false;
+            sendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            sendBtn.innerText = origText;
+            otpHint.textContent = "You can try sending again.";
+          } else {
+            sendBtn.innerText = `Wait ${wait}s`;
+          }
+        }, 1000);
+      } else if (code === 'auth/invalid-phone-number') {
+        showToast("Invalid phone number format");
+        otpHint.textContent = "Use format: 10 digits or +91XXXXXXXXXX";
+      } else {
+        showToast((err && err.message) || "Failed to send OTP ❌");
+      }
+    }
+  };
+
+  window.verifyPhoneOTP = async function (otp) {
+    if (!window.confirmationResult) {
+      return false;
+    }
+
+    try {
+      await window.confirmationResult.confirm(otp.trim());
+      return true;
+    } catch (err) {
+      console.log("Firebase verify OTP error:", err);
+      showToast(err.message || "Invalid OTP ❌");
+      return false;
+    }
+  };
+
+  window.resendOTP = function () {
+    const sendBtn = document.getElementById("sendOtpBtn");
+    if (sendBtn && !sendBtn.disabled) {
+      return window.sendOTP();
+    }
+    showToast("Please wait before requesting another code.");
+  };
+</script>
+
+</body>
+</html>

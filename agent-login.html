@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Agent Login - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+  <div class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-slate-950 to-black -z-10"></div>
+
+  <main class="mx-auto flex min-h-screen max-w-md items-center px-5">
+    <section class="w-full rounded-3xl border border-white/10 bg-white/10 p-7 shadow-2xl backdrop-blur-xl">
+      <button onclick="window.location.href='index.html'" class="mb-6 rounded-xl bg-white/10 px-4 py-2 hover:bg-white/20">Home</button>
+      <p class="text-sm uppercase tracking-widest text-orange-200">BUJJI BAJJI</p>
+      <h1 class="mt-2 text-3xl font-black text-orange-400">Delivery Agent Login</h1>
+
+      <div class="mt-7 space-y-4">
+        <input id="agentEmail" type="email" placeholder="Agent email" class="w-full rounded-2xl border border-white/10 bg-white/90 px-4 py-3 text-slate-950 outline-none focus:border-orange-400">
+        <input id="agentPassword" type="password" placeholder="Password" class="w-full rounded-2xl border border-white/10 bg-white/90 px-4 py-3 text-slate-950 outline-none focus:border-orange-400">
+        <button onclick="agentLogin()" class="w-full rounded-2xl bg-orange-500 px-5 py-3 font-bold text-black hover:bg-orange-600">Login</button>
+        <p id="message" class="text-sm text-orange-100"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API_ROOT = "http://localhost:3000";
+
+    async function agentLogin() {
+      const email = document.getElementById("agentEmail").value.trim();
+      const password = document.getElementById("agentPassword").value;
+      const message = document.getElementById("message");
+
+      if (!email || !password) {
+        message.innerText = "Enter email and password";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_ROOT}/agent-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          message.innerText = data.message || "Login failed";
+          return;
+        }
+
+        localStorage.setItem("agentToken", data.token);
+        localStorage.setItem("agentEmail", data.agent.email);
+        localStorage.setItem("agentName", data.agent.name);
+        location.href = "agent-dashboard.html";
+      }
+      catch (err) {
+        message.innerText = "Server not reachable";
+      }
+    }
+    function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+</body>
+</html>

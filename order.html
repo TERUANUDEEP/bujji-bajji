@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+  body {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex justify-center items-center h-screen text-white">
+
+  <!-- 🎥 Background Video -->
+  <video autoplay muted loop class="fixed top-0 left-0 w-full h-full object-cover -z-10 brightness-75">
+    <source src="background.mp4" type="video/mp4">
+  </video>
+
+  <!-- Glass Box -->
+  <div class="bg-white/10 backdrop-blur-md p-8 rounded-xl shadow text-center">
+
+    <h1 class="text-3xl font-bold text-green-400">🎉 Order Placed!</h1>
+    <p class="mt-2 opacity-90">Your bajjis are on the way 😋</p>
+
+    <a href="index.html" 
+      class="mt-4 inline-block bg-orange-500 px-4 py-2 rounded hover:bg-orange-600">
+      Back to Home
+    </a>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      protectPage();
+    });
+    function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>

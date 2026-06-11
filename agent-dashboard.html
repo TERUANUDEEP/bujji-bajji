@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Dashboard - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+  <div class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-slate-950 to-black -z-10"></div>
+
+  <main class="mx-auto max-w-6xl px-5 py-8">
+    <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-orange-200">Delivery Desk</p>
+        <h1 class="text-4xl font-black text-orange-400">Agent Dashboard</h1>
+        <div class="mt-4">
+
+  <button
+
+  id="availabilityBtn"
+
+  onclick="toggleAvailability()"
+
+  class="rounded-xl bg-green-500 px-4 py-2 font-bold">
+
+    🟢 Available
+
+  </button>
+
+</div>
+        <p id="agentName" class="mt-2 text-slate-300"></p>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="loadOrders()" class="rounded-xl bg-blue-500 px-4 py-2 font-semibold hover:bg-blue-600">Refresh</button>
+        <button onclick="logout()" class="rounded-xl bg-red-500 px-4 py-2 font-semibold hover:bg-red-600">Logout</button>
+      </div>
+    </header>
+
+    <section id="ordersContainer" class="grid gap-5"></section>
+  </main>
+
+  <script>
+    const API_ROOT = "http://localhost:3000";
+    const agentEmail = localStorage.getItem("agentEmail");
+    let availability =
+localStorage.getItem(
+  "agentAvailability"
+) || "Available";
+    const agentName = localStorage.getItem("agentName");
+    const agentToken = localStorage.getItem("agentToken");
+
+    if (!agentEmail || !agentToken) {
+      location.href = "agent-login.html";
+    }
+
+    document.getElementById("agentName").innerText = `${agentName || "Agent"} · ${agentEmail || ""}`;
+
+    function money(value) {
+      return `₹${Number(value || 0).toFixed(0)}`;
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById("ordersContainer");
+
+      if (!orders.length) {
+        container.innerHTML = `<div class="rounded-3xl border border-white/10 bg-white/10 p-8 text-center text-slate-300">No assigned orders yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = orders.map(order => {
+        const items = (order.items || []).map(item => `
+          <li class="flex justify-between gap-3 border-b border-white/10 py-2 last:border-0">
+            <span>${item.name} x ${item.qty || 1}</span>
+            <span>${money((item.price || 0) * (item.qty || 1))}</span>
+          </li>
+        `).join("");
+
+        const delivered = (order.status || "").includes("Delivered");
+        return `
+          <article class="rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+            <div class="flex flex-wrap justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold text-orange-300">Order #${order._id.slice(-6)}</h2>
+                <p class="mt-1 text-slate-300">${order.user || "Customer email missing"}</p>
+                <p class="text-slate-300">${order.phone || "Phone missing"}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-bold text-green-300">${money(order.total)}</p>
+                <p class="text-sm text-orange-100">${order.status || "Preparing"}</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-[1.2fr_1fr]">
+              <div class="rounded-2xl bg-slate-950/50 p-4">
+                <p class="mb-2 font-semibold text-orange-200">Items</p>
+                <ul>${items}</ul>
+              </div>
+              <div class="rounded-2xl bg-slate-950/50 p-4">
+                <p class="mb-2 font-semibold text-orange-200">Address</p>
+                <p class="text-slate-200">${order.address || "Address missing"}</p>
+              </div>
+            </div>
+
+            ${delivered ? `
+              <div class="mt-5 rounded-2xl bg-green-500/15 p-4 font-semibold text-green-300">Delivered and closed</div>
+            ` : `
+              <div class="mt-5 grid gap-3 md:grid-cols-[auto_1fr_auto_auto]">
+                <button onclick="sendOtp('${order._id}')" class="rounded-xl bg-blue-500 px-4 py-3 font-semibold hover:bg-blue-600">Send OTP</button>
+                <input id="otp-${order._id}" placeholder="Enter customer OTP" class="rounded-xl bg-white/90 px-4 py-3 text-slate-950 outline-none">
+                <button onclick="verifyOtp('${order._id}')" class="rounded-xl bg-yellow-400 px-4 py-3 font-semibold text-black hover:bg-yellow-500">Verify</button>
+                <button
+
+onclick="markDelivered('${order._id}')"
+
+${!order.otpVerified ? "disabled" : ""}
+
+class="rounded-xl px-4 py-2 font-bold
+
+${
+
+order.otpVerified
+
+?
+
+'bg-green-500 animate-pulse shadow-lg shadow-green-500/50'
+
+:
+
+'bg-slate-600 cursor-not-allowed opacity-50'
+
+}
+
+">
+
+${
+
+order.otpVerified
+
+?
+
+'✅ Mark Delivered'
+
+:
+
+'🔒 Verify OTP First'
+
+}
+
+</button>
+              </div>
+            `}
+          </article>
+        `;
+      }).join("");
+    }
+async function toggleAvailability() {
+
+  availability =
+
+    availability ===
+    "Available"
+
+    ?
+
+    "Offline"
+
+    :
+
+    "Available";
+
+  const res = await fetch(
+
+    `${API_ROOT}/agent-availability`,
+
+    {
+
+      method: "POST",
+
+      headers: {
+
+        "Content-Type":
+        "application/json"
+
+      },
+
+      body: JSON.stringify({
+
+        email: agentEmail,
+
+        availability
+
+      })
+
+    }
+
+  );
+
+  const data =
+    await res.json();
+
+  if (data.success) {
+
+    localStorage.setItem(
+
+      "agentAvailability",
+
+      availability
+
+    );
+
+    updateAvailabilityButton();
+
+  }
+
+}
+function updateAvailabilityButton() {
+
+  const btn =
+
+    document.getElementById(
+      "availabilityBtn"
+    );
+
+  if (!btn) return;
+
+  if (
+    availability ===
+    "Available"
+  ) {
+
+    btn.innerHTML =
+      "🟢 Available";
+
+    btn.className =
+      "rounded-xl bg-green-500 px-4 py-2 font-bold";
+
+  }
+
+  else {
+
+    btn.innerHTML =
+      "🔴 Offline";
+
+    btn.className =
+      "rounded-xl bg-red-500 px-4 py-2 font-bold";
+
+  }
+
+}
+
+    async function loadOrders() {
+      const container = document.getElementById("ordersContainer");
+      container.innerHTML = `<div class="rounded-3xl border border-white/10 bg-white/10 p-8 text-center text-slate-300">Loading assigned orders...</div>`;
+
+      try {
+        const res = await fetch(`${API_ROOT}/agent-orders/${encodeURIComponent(agentEmail)}`, {
+          headers: { Authorization: `Bearer ${agentToken}` }
+        });
+        const orders = await res.json();
+        renderOrders(Array.isArray(orders) ? orders : []);
+      }
+      catch (err) {
+        container.innerHTML = `<div class="rounded-3xl border border-red-400/30 bg-red-500/10 p-8 text-center text-red-200">Failed to load orders</div>`;
+      }
+    }
+
+    async function sendOtp(orderId) {
+
+  try {
+
+    const res = await fetch(
+      `${API_ROOT}/send-delivery-otp`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${agentToken}`
+        },
+
+        body: JSON.stringify({
+          orderId
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+
+      showToast(
+        data.message ||
+        "Failed to send OTP",
+        "error"
+      );
+
+      return;
+
+    }
+
+    showToast(
+      data.message ||
+      "OTP sent successfully"
+    );
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    showToast(
+      "Server error while sending OTP",
+      "error"
+    );
+
+  }
+
+}
+
+    async function verifyOtp(orderId) {
+      const otp = document.getElementById(`otp-${orderId}`).value.trim();
+      const res = await fetch(`${API_ROOT}/verify-delivery-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${agentToken}`
+        },
+        body: JSON.stringify({ orderId, otp, agentEmail })
+      });
+      const data = await res.json();
+      showToast(
+  data.message ||
+  (data.success
+    ? "OTP verified"
+    : "Invalid OTP")
+);
+
+if (data.success) {
+
+  loadOrders();
+
+}
+    }
+
+    async function markDelivered(orderId) {
+      const res = await fetch(`${API_ROOT}/mark-delivered`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${agentToken}`
+        },
+        body: JSON.stringify({ orderId, agentEmail })
+      });
+      const data = await res.json();
+      showToast(data.message || "Updated");
+      loadOrders();
+    }
+
+    function logout() {
+      localStorage.removeItem("agentToken");
+      localStorage.removeItem("agentEmail");
+      localStorage.removeItem("agentName");
+      location.href = "agent-login.html";
+    }
+    function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+    loadOrders();
+    updateAvailabilityButton();
+
+   setInterval(loadOrders, 60000);
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+</body>
+</html>

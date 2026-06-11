@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Checkout - BUJJI BAJJI</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+font-family:'Outfit',sans-serif;
+}
+
+.glass{
+background:rgba(255,255,255,0.08);
+-webkit-backdrop-filter:blur(20px);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,0.1);
+}
+
+</style>
+
+</head>
+
+<body class="min-h-screen text-white">
+
+<!-- VIDEO -->
+
+<video
+autoplay
+muted
+loop
+class="fixed inset-0 w-full h-full object-cover -z-10 brightness-75">
+
+<source
+src="background.mp4"
+type="video/mp4">
+
+</video>
+
+<!-- OVERLAY -->
+
+<div class="fixed inset-0 bg-black/40 -z-10"></div>
+
+<!-- PAGE -->
+
+<div class="max-w-6xl mx-auto p-6">
+
+<div class="flex items-center justify-between mb-8">
+
+<div class="flex items-center gap-4">
+
+<button
+onclick="window.location.href='cart.html'"
+class="
+bg-white/10
+hover:bg-white/20
+backdrop-blur-xl
+px-4
+py-2
+rounded-xl
+font-bold
+transition">
+
+← Back to Cart
+
+</button>
+
+<h1
+class="text-4xl font-black text-orange-400">
+
+🧾 Checkout
+
+</h1>
+
+</div>
+
+</div>
+<div class="grid md:grid-cols-[1.3fr_0.7fr] gap-8 items-start">
+
+<!-- LEFT -->
+
+<div class="glass rounded-3xl p-6">
+
+<h2 class="text-2xl font-bold mb-6">
+📍 Delivery Details
+</h2>
+<div
+id="selectedAddressCard"
+class="
+mb-6
+bg-green-500/10
+border
+border-green-500/30
+rounded-2xl
+p-4
+shadow-lg
+shadow-green-500/10">
+
+<div class="text-gray-300">
+📍 Select Delivery Address
+</div>
+
+</div>
+<button
+onclick="toggleAddressList()"
+class="
+mb-4
+bg-orange-500
+hover:bg-orange-600
+px-4
+py-2
+rounded-xl
+font-bold">
+📍 Change Delivery Address
+
+</button>
+
+<div
+id="savedAddresses"
+class="hidden mb-6 space-y-3">
+</div>
+
+<button
+id="addNewAddressBtn"
+onclick="toggleAddressForm()"
+class="
+hidden
+w-full
+bg-blue-500
+hover:bg-blue-600
+p-3
+rounded-xl
+font-bold">
+
+➕ Add New Address
+
+</button>
+
+<div
+id="addressModal"
+class="
+hidden
+fixed
+inset-0
+bg-black/60
+backdrop-blur-sm
+flex
+items-center
+justify-center
+z-50">
+<div
+class="
+glass
+rounded-3xl
+p-6
+w-full
+max-w-lg">
+
+<h2
+class="
+text-2xl
+font-bold
+mb-4
+text-orange-400">
+
+➕ Add New Address
+
+</h2>
+
+<input
+id="checkoutName"
+placeholder="Full Name"
+class="w-full p-3 rounded-xl text-black">
+
+<input
+id="checkoutPhone"
+placeholder="Phone Number"
+class="w-full p-3 rounded-xl text-black">
+
+<input
+id="checkoutHouse"
+placeholder="House / Flat No"
+class="w-full p-3 rounded-xl text-black">
+
+<input
+id="checkoutStreet"
+placeholder="Street"
+class="w-full p-3 rounded-xl text-black">
+
+<input
+id="checkoutCity"
+placeholder="City"
+class="w-full p-3 rounded-xl text-black">
+
+<input
+id="checkoutPincode"
+placeholder="Pincode"
+class="w-full p-3 rounded-xl text-black">
+
+<textarea
+id="checkoutInstructions"
+placeholder="Delivery Instructions (Optional)"
+class="w-full p-3 rounded-xl text-black h-24"></textarea>
+
+<button
+type="button"
+onclick="useCurrentLocation()"
+class="w-full bg-blue-500 hover:bg-blue-600 transition p-3 rounded-xl font-bold">
+
+📍 Use Current Location
+
+</button>
+<div class="flex gap-3 mt-4">
+
+<button
+onclick="saveCheckoutInfo()"
+class="
+flex-1
+bg-green-500
+hover:bg-green-600
+p-3
+rounded-xl
+font-bold">
+
+Save Address
+
+</button>
+
+<button
+onclick="toggleAddressForm()"
+class="
+flex-1
+bg-gray-600
+hover:bg-gray-700
+p-3
+rounded-xl
+font-bold">
+
+Cancel
+
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+<button
+onclick="saveCheckoutInfo()"
+class="w-full bg-green-500 hover:bg-green-600 transition p-3 rounded-xl font-bold">
+
+Continue To Payment →
+
+</button>
+
+</div>
+
+<!-- RIGHT -->
+<div class="glass rounded-3xl p-6 sticky top-24 h-fit">
+
+<h2 class="text-2xl font-bold mb-6">
+🛒 Order Summary
+</h2>
+
+<div id="orderSummary"></div>
+
+<div
+id="checkoutTotal"
+class="mt-6 text-2xl font-bold text-orange-300">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+    const API_ROOT =
+"http://localhost:3000";
+
+async function loadSavedAddresses(){
+
+try{
+
+let email =
+localStorage.getItem(
+"userEmail"
+);
+
+let res =
+await fetch(
+`${API_ROOT}/addresses/${email}`
+);
+
+let addresses =
+await res.json();
+
+let container =
+document.getElementById(
+"savedAddresses"
+);
+
+container.innerHTML =
+addresses.map(a => `
+
+<div
+onclick="selectCheckoutAddress('${a.label}')"
+class="
+address-card
+cursor-pointer
+border
+border-white/10
+rounded-2xl
+p-4
+bg-white/5
+hover:bg-white/10
+transition-all
+duration-300">
+
+<div class="font-bold text-orange-400">
+${a.label}
+
+${a.isDefault ? "⭐" : ""}
+
+</div>
+
+<div class="text-sm">
+
+${a.fullName}
+
+</div>
+
+<div class="text-sm">
+
+${a.house},
+${a.street}
+
+</div>
+
+<div class="text-sm">
+
+${a.city}
+-
+${a.pincode}
+
+</div>
+
+</div>
+
+`).join("");
+}
+catch(err){
+
+console.log(err);
+
+showToast(
+"Failed to load addresses",
+"error"
+);
+
+}
+
+}
+
+function toggleAddressForm(){
+
+document
+.getElementById(
+"addressModal"
+)
+.classList.toggle(
+"hidden"
+);
+
+}
+
+function loadSummary(){
+
+let cart =
+JSON.parse(
+localStorage.getItem("cart")
+) || [];
+
+let summary =
+document.getElementById(
+"orderSummary"
+);
+
+let total = 0;
+
+summary.innerHTML =
+cart.map(item => {
+
+total +=
+item.price * item.qty;
+
+return `
+<div class="flex justify-between border-b border-white/10 py-2">
+
+<span>
+${item.name}
+x${item.qty}
+</span>
+
+<span>
+₹${item.price * item.qty}
+</span>
+
+</div>
+`;
+
+}).join("");
+
+document.getElementById(
+"checkoutTotal"
+).innerHTML =
+`Total: ₹${total}`;
+
+}
+
+async function useCurrentLocation(){
+
+  if(!navigator.geolocation){
+
+    showToast(
+      "Location not supported",
+      "error"
+    );
+
+    return;
+
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    async position => {
+
+      let lat =
+        position.coords.latitude;
+
+      let lon =
+        position.coords.longitude;
+
+      try{
+
+        let res =
+          await fetch(
+
+`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+
+          );
+
+        let data =
+          await res.json();
+
+        let address =
+          data.address || {};
+
+          let fullAddress =
+  data.display_name || "";
+
+        document.getElementById(
+  "checkoutCity"
+).value =
+
+  address.city ||
+
+  address.town ||
+
+  address.village ||
+
+  address.county ||
+
+  "";
+
+        document.getElementById(
+          "checkoutPincode"
+        ).value =
+          address.postcode || "";
+          
+
+        document.getElementById(
+  "checkoutStreet"
+).value =
+  fullAddress;
+        localStorage.setItem(
+
+          "locationCoords",
+
+          JSON.stringify({
+
+            latitude:lat,
+            longitude:lon
+
+          })
+
+        );
+
+      }
+
+      catch(err){
+
+        console.log(err);
+
+        showToast(
+          "Failed to fetch address",
+          "error"
+        );
+
+      }
+
+    },
+
+    err => {
+
+  showToast(
+    "Location permission denied",
+    "error"
+  );
+
+},
+
+{
+  enableHighAccuracy: true,
+  timeout: 10000,
+  maximumAge: 0
+}
+
+);
+
+}
+
+
+
+
+async function loadDefaultAddress(){
+
+  try{
+
+    let email =
+      localStorage.getItem(
+        "userEmail"
+      );
+
+    let res =
+      await fetch(
+`${API_ROOT}/default-address/${email}`
+      );
+
+    let address =
+      await res.json();
+
+    if(!address)
+      return;
+
+    localStorage.setItem(
+"selectedAddressLabel",
+address.label
+);
+
+    document.getElementById(
+      "checkoutName"
+    ).value =
+      address.fullName || "";
+
+    document.getElementById(
+      "checkoutPhone"
+    ).value =
+      address.phone || "";
+
+    document.getElementById(
+      "checkoutHouse"
+    ).value =
+      address.house || "";
+
+    document.getElementById(
+      "checkoutStreet"
+    ).value =
+      address.street || "";
+
+    document.getElementById(
+      "checkoutCity"
+    ).value =
+      address.city || "";
+
+    document.getElementById(
+      "checkoutPincode"
+    ).value =
+      address.pincode || "";
+      document.getElementById(
+"selectedAddressCard"
+).innerHTML = `
+
+<div class="font-bold text-green-400 text-lg">
+📍 ${address.label}
+</div>
+
+<div>${address.fullName}</div>
+
+<div>${address.phone}</div>
+
+<div>${address.house}, ${address.street}</div>
+
+<div>${address.city} - ${address.pincode}</div>
+
+`;
+
+  }
+
+  catch(err){
+
+    console.log(err);
+
+  }
+
+}
+
+function toggleAddressList(){
+
+document
+.getElementById(
+"savedAddresses"
+)
+.classList.toggle(
+"hidden"
+);
+
+document
+.getElementById(
+"addNewAddressBtn"
+)
+.classList.toggle(
+"hidden"
+);
+
+}
+
+async function selectCheckoutAddress(label){
+
+document
+.querySelectorAll(
+".address-card"
+)
+.forEach(card=>{
+
+card.classList.remove(
+"border-green-500",
+"bg-green-500/30",
+"shadow-lg",
+"shadow-green-500/20",
+"scale-105"
+);
+
+});
+
+let selectedCard =
+Array.from(
+document.querySelectorAll(
+".address-card"
+)
+).find(card=>
+
+card.innerText.includes(
+label
+)
+
+);
+
+if(selectedCard){
+
+selectedCard.classList.add(
+"border-green-500",
+"bg-green-500/20",
+"scale-105"
+);
+
+}
+
+localStorage.setItem(
+"selectedAddressLabel",
+label
+);
+
+
+try{
+
+let email =
+localStorage.getItem(
+"userEmail"
+);
+
+let res =
+await fetch(
+`${API_ROOT}/addresses/${email}`
+);
+
+let addresses =
+await res.json();
+
+let address =
+addresses.find(
+a => a.label === label
+);
+
+if(!address)
+return;
+
+document.getElementById(
+"checkoutName"
+).value =
+address.fullName || "";
+
+document.getElementById(
+"checkoutPhone"
+).value =
+address.phone || "";
+
+document.getElementById(
+"checkoutHouse"
+).value =
+address.house || "";
+
+document.getElementById(
+"checkoutStreet"
+).value =
+address.street || "";
+
+document.getElementById(
+"checkoutCity"
+).value =
+address.city || "";
+
+document.getElementById(
+"checkoutPincode"
+).value =
+address.pincode || "";
+
+document.getElementById(
+"selectedAddressCard"
+).innerHTML = `
+
+<div class="font-bold text-green-400 text-lg">
+
+📍 ${label}
+
+</div>
+
+<div>
+
+${address.fullName}
+
+</div>
+
+<div>
+
+${address.phone}
+
+</div>
+
+<div>
+
+${address.house},
+${address.street}
+
+</div>
+
+<div>
+
+${address.city}
+-
+${address.pincode}
+
+</div>
+
+`;
+
+}
+catch(err){
+
+console.log(err);
+
+}
+
+}
+
+async function saveCheckoutInfo(){
+let selectedAddress =
+
+localStorage.getItem(
+"selectedAddressLabel"
+);
+
+if(!selectedAddress){
+
+showToast(
+"Please select an address",
+"error"
+);
+
+return;
+
+}
+
+let name =
+document.getElementById(
+"checkoutName"
+).value.trim();
+
+let phone =
+document.getElementById(
+"checkoutPhone"
+).value.trim();
+
+let house =
+document.getElementById(
+"checkoutHouse"
+).value.trim();
+
+let street =
+document.getElementById(
+"checkoutStreet"
+).value.trim();
+
+let city =
+document.getElementById(
+"checkoutCity"
+).value.trim();
+
+let pincode =
+document.getElementById(
+"checkoutPincode"
+).value.trim();
+
+let instructions =
+document.getElementById(
+"checkoutInstructions"
+).value.trim();
+
+console.log({
+name,
+phone,
+house,
+street,
+city,
+pincode
+});
+
+
+if(
+!name ||
+!phone ||
+!house ||
+!street ||
+!city ||
+!pincode
+){
+
+showToast(
+"Please fill all required fields",
+"error"
+);
+
+return;
+
+}
+if(
+ !/^[6-9]\d{9}$/
+ .test(phone)
+){
+
+ showToast(
+   "Enter valid phone number",
+   "error"
+ );
+
+ return;
+
+}
+
+await fetch(
+  `${API_ROOT}/save-address`,
+  {
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":
+      "application/json"
+    },
+
+    body:JSON.stringify({
+
+      email:
+      localStorage.getItem(
+        "userEmail"
+      ),
+
+      address:{
+
+        label:selectedAddress,
+
+        fullName:name,
+
+        phone,
+
+        house,
+
+        street,
+
+        city,
+
+        pincode,
+
+        isDefault:true
+
+      }
+
+    })
+
+  }
+);
+
+localStorage.setItem(
+"checkoutInfo",
+
+JSON.stringify({
+
+name,
+phone,
+
+house,
+street,
+
+fullAddress: street,
+
+city,
+pincode,
+
+instructions,
+
+location:
+JSON.parse(
+localStorage.getItem(
+"locationCoords"
+)
+) || null
+
+})
+);
+
+window.location.href =
+"payment.html";
+
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+loadSummary();
+
+loadSavedAddresses();
+loadDefaultAddress();
+
+
+</script>
+<div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>

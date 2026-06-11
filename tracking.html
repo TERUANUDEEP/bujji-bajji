@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+  <video autoplay muted loop class="fixed inset-0 h-full w-full object-cover opacity-30 -z-10">
+    <source src="background.mp4" type="video/mp4">
+  </video>
+  <div class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-slate-950/70 to-black -z-10"></div>
+
+  <main class="mx-auto max-w-4xl px-5 py-8">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <button onclick="window.location.href='index.html'" class="rounded-xl bg-white/10 px-4 py-2 hover:bg-white/20">Home</button>
+      <p id="refreshStatus" class="text-sm text-orange-200">Auto refresh is on</p>
+    </div>
+
+    <section class="rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+      <p class="text-sm uppercase tracking-widest text-orange-200">Live Tracking</p>
+      <h1 class="mt-2 text-4xl font-black text-orange-400">Track Order</h1>
+      <p id="orderId" class="mt-3 break-all text-lg font-semibold text-orange-100">Loading...</p>
+
+      <div class="mt-8">
+        <div class="h-3 overflow-hidden rounded-full bg-white/10">
+          <div id="progressBar" class="h-full w-0 rounded-full bg-gradient-to-r from-orange-400 via-yellow-300 to-green-400 transition-all duration-500"></div>        </div>
+      </div>
+
+      <div id="timeline" class="mt-8 space-y-4"></div>
+
+      <div class="mt-8 rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+        <div
+id="orderDetails"
+class="mt-6 border-t border-white/10 pt-4">
+</div>
+        <p class="text-sm text-slate-300">Current status</p>
+        <p id="currentStatus" class="mt-2 text-2xl font-bold text-green-300">Preparing</p>
+        <p id="lastUpdated" class="mt-2 text-sm text-slate-400"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API_ROOT = "http://localhost:3000";
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("id");
+    const steps = [
+      "Preparing 🍳",
+      "Cooking 👨‍🍳",
+      "Packed 📦",
+      "Out For Delivery 🚚",
+      "Delivered ✅"
+    ];
+
+    document.getElementById("orderId").innerText = orderId || "Order ID missing";
+
+    function normalizeStatus(status) {
+      if (!status) return 0;
+      if (status.includes("Delivered")) return 4;
+      if (status.includes("Out For Delivery") || status.includes("On the way")) return 3;
+      if (status.includes("Packed")) return 2;
+      if (status.includes("Cooking")) return 1;
+      return 0;
+    }
+
+    function renderTimeline(activeIndex) {
+      document.getElementById("timeline").innerHTML = steps.map((step, index) => {
+        const done = index <= activeIndex;
+        return `
+          <div class="flex items-center gap-4 rounded-2xl border ${done ? "border-green-400/40 bg-green-500/10" : "border-white/10 bg-white/5"} p-4">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${done ? "bg-green-500 text-black" : "bg-white/10 text-white"} font-bold">
+              ${done ? "✓" : index + 1}
+            </div>
+            <div>
+              <p class="font-semibold">${step}</p>
+              <p class="text-sm text-slate-300">${done ? "Completed or active" : "Waiting"}</p>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function getOrderAge(createdAt) {
+
+  if (!createdAt)
+    return "Unknown";
+
+  const minutes = Math.floor(
+
+    (
+      new Date() -
+      new Date(createdAt)
+    ) / 60000
+
+  );
+
+  if (minutes < 60) {
+
+    return `${minutes} min ago`;
+
+  }
+
+  const hours =
+    Math.floor(
+      minutes / 60
+    );
+
+  return `${hours} hr ago`;
+
+}
+
+
+    async function loadTracking() {
+     
+      if (!orderId) return;
+
+      try {
+        const res = await fetch(`${API_ROOT}/order/${orderId}`);
+        if (!res.ok) throw new Error("Order not found");
+        const order = await res.json();
+         const agentName =
+
+order.assignedAgentName
+
+||
+
+order.assignedAgent
+
+||
+
+"Waiting for assignment";
+        document.getElementById(
+  "orderDetails"
+).innerHTML = `
+<p class="text-cyan-300">
+
+  👨 Agent:
+  ${agentName}
+
+</p>
+<p class="text-orange-300">
+
+  🕒 Ordered:
+  ${getOrderAge(order.createdAt)}
+
+</p>
+
+<p class="text-slate-300">
+
+  💰 Amount:
+  ₹${order.total || 0}
+
+</p>
+
+<p class="text-slate-300">
+
+  📞 Phone:
+  ${order.phone || "N/A"}
+
+</p>
+
+<p class="text-slate-300">
+
+  📍 Address:
+  ${order.address || "N/A"}
+
+</p>
+
+`;
+        let status =
+  order.status || "Preparing 🍳";
+
+const minutesPassed =
+  Math.floor(
+    (
+      Date.now() -
+      new Date(order.createdAt).getTime()
+    ) / 60000
+  );
+
+if (
+  status === "Preparing 🍳"
+) {
+
+  if (minutesPassed >= 1) {
+
+    status = "Packed 📦";
+
+  }
+
+  else if (
+    minutesPassed >= 0.5
+  ) {
+
+    status = "Cooking 👨‍🍳";
+
+  }
+
+}
+
+const activeIndex =
+  normalizeStatus(status);
+
+document.getElementById(
+  "currentStatus"
+).innerText = status;
+       document.getElementById("progressBar").classList.remove(
+  "w-0","w-1/4","w-2/4","w-3/4","w-full"
+);
+
+const widths = [
+  "w-0",
+  "w-1/4",
+  "w-2/4",
+  "w-3/4",
+  "w-full"
+];
+
+document.getElementById("progressBar")
+.classList.add(widths[activeIndex]);
+        document.getElementById("lastUpdated").innerText = `Last checked: ${new Date().toLocaleTimeString()}`;
+        renderTimeline(activeIndex);
+      }
+      catch (err) {
+        document.getElementById("currentStatus").innerText = "Unable to load order";
+        document.getElementById("refreshStatus").innerText = err.message;
+        renderTimeline(0);
+      }
+    }
+
+    function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+    renderTimeline(0);
+    loadTracking();
+    setInterval(loadTracking, 5000);
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>

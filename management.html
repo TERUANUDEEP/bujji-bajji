@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>Bajji Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  
+</head>
+
+<body class="bg-slate-950 text-white min-h-screen">
+
+  <div class="max-w-6xl mx-auto p-6">
+
+<div class="flex flex-wrap gap-3 mb-6">
+
+      <button
+        onclick="window.location.href='index.html'"
+        class="bg-orange-500 px-4 py-2 rounded-xl">
+
+        🏠 Home
+
+      </button>
+
+      <button
+        onclick="loadUsers()"
+        class="bg-blue-500 px-4 py-2 rounded-xl">
+
+        🔄 Refresh
+
+      </button>
+
+      <button
+        onclick="window.location.href='delivery-management.html'"
+        class="bg-green-500 px-4 py-2 rounded-xl">
+
+        🚚 Delivery
+
+      </button>
+
+      <button
+        onclick="window.location.href='analytics.html'"
+        class="bg-yellow-500 px-4 py-2 rounded-xl text-black">
+
+        📊 Analytics
+
+      </button>
+
+    </div>
+
+    <h1 class="text-4xl font-bold text-orange-400 mb-8">
+      👑 Superadmin Management
+    </h1>
+    
+<div id="stats" class="mb-6"></div>
+<div
+  id="dashboardCards"
+  class="grid md:grid-cols-4 gap-4 mb-8">
+</div>
+
+<input
+  id="userSearch"
+  placeholder="🔍 Search users..."
+  class="w-full p-3 rounded-xl text-black mb-6"
+/>
+
+    
+
+    <div id="usersContainer"
+         class="grid gap-4">
+    </div>
+
+  </div>
+
+<script>
+
+
+const API_ROOT = "http://localhost:3000";
+let allUsers = [];
+
+let role =
+  localStorage.getItem(
+    "userRole"
+  );
+
+if (
+  role !== "superadmin"
+) {
+
+  showToast(
+    "Superadmin only!"
+  );
+
+  location.href =
+    "index.html";
+
+}
+async function loadUsers() {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/users`
+      );
+
+    let users =
+      await res.json();
+
+    allUsers = users;
+
+    let totalUsers =
+      users.length;
+
+    let admins =
+      users.filter(
+        u => u.role === "admin"
+      ).length;
+
+    let superadmins =
+      users.filter(
+        u => u.role === "superadmin"
+      ).length;
+      let agents =
+  allUsers.filter(
+    user =>
+      user.role === "agent"
+  ).length;
+
+    document.getElementById(
+  "stats"
+).innerHTML = `
+
+<div class="flex gap-4">
+
+  <button
+    onclick="showAllUsers()"
+    class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition">
+
+    👥 ${totalUsers} Users
+
+  </button>
+
+  <button
+    onclick="showAdmins()"
+    class="bg-white/5 hover:bg-blue-500/20 p-4 rounded-xl transition">
+
+    🛡 ${admins} Admins
+
+  </button>
+
+  <button
+    onclick="showSuperadmins()"
+    class="bg-white/5 hover:bg-yellow-500/20 p-4 rounded-xl transition">
+
+    👑 ${superadmins} Superadmins
+
+  </button>
+  <button
+    onclick="showAgents()"
+    class="bg-white/5 hover:bg-green-500/20 p-4 rounded-xl transition">
+
+    🚚 ${agents} Agents
+
+</button>
+
+</div>
+
+`;
+
+    renderUsers(users);
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+
+async function loadDashboard() {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/dashboard-stats`
+      );
+
+    let data =
+      await res.json();
+
+    document.getElementById(
+      "dashboardCards"
+    ).innerHTML = `
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        👥 Users
+        <h2 class="text-2xl font-bold">
+          ${data.users}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        🛡 Admins
+        <h2 class="text-2xl font-bold">
+          ${data.admins}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        👑 Superadmins
+        <h2 class="text-2xl font-bold">
+          ${data.superadmins}
+        </h2>
+      </div>
+      
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        🍽 Items
+        <h2 class="text-2xl font-bold">
+          ${data.items}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        📦 Orders
+        <h2 class="text-2xl font-bold">
+          ${data.orders}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+  💰 Revenue
+  <h2 class="text-2xl font-bold text-green-400">
+    ₹${data.revenue || 0}
+  </h2>
+</div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        💬 Feedbacks
+        <h2 class="text-2xl font-bold">
+          ${data.feedbacks}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        ⭐ Avg Rating
+        <h2 class="text-2xl font-bold">
+          ${data.averageRating}
+        </h2>
+      </div>
+
+      <div class="bg-white/5 p-4 rounded-xl">
+        ❤️ Likes
+        <h2 class="text-2xl font-bold">
+          ${data.likes}
+        </h2>
+      </div>
+
+    `;
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+
+function renderUsers(users) {
+
+  let container =
+    document.getElementById(
+      "usersContainer"
+    );
+
+  container.innerHTML =
+    users.map(user => `
+
+      <div
+        class="bg-white/5 rounded-2xl p-5 flex justify-between items-center">
+
+        <div>
+
+          <h3 class="font-bold text-orange-300">
+            ${user.name || "No Name"}
+          </h3>
+
+          <p>
+            ${user.email}
+          </p>
+
+          <p class="text-sm text-slate-400">
+            ${
+              user.role === "superadmin"
+              ? "👑 Superadmin"
+              : user.role === "admin"
+              ? "🛡 Admin"
+              : "👤 User"
+            }
+          </p>
+
+        </div>
+
+        <div class="flex gap-2">
+
+          ${
+  user.role === "superadmin"
+  ? `
+  <button
+    onclick="removeSuperadmin('${user.email}')"
+    class="bg-red-500 px-4 py-2 rounded-xl">
+
+    Remove Superadmin
+
+  </button>
+  `
+  : ""
+}
+
+          ${
+  user.role === "user"
+  ? `
+  <button
+    onclick="makeAdmin('${user.email}')"
+    class="bg-green-500 px-4 py-2 rounded-xl">
+    🛡 Admin
+  </button>
+
+  <button
+    onclick="makeSuperadmin('${user.email}')"
+    class="bg-yellow-500 px-4 py-2 rounded-xl text-black">
+    👑 Superadmin
+  </button>
+  `
+  : ""
+}
+
+          ${
+            user.role === "admin"
+            ? `
+            <button
+              onclick="removeAdmin('${user.email}')"
+              class="bg-red-500 px-4 py-2 rounded-xl">
+              Demote
+            </button>
+            `
+            : ""
+          }
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function showAllUsers() {
+
+  renderUsers(allUsers);
+
+}
+
+function showAdmins() {
+
+  let admins =
+    allUsers.filter(
+      user =>
+        user.role === "admin"
+    );
+
+  renderUsers(admins);
+
+}
+
+function showSuperadmins() {
+
+  let superadmins =
+    allUsers.filter(
+      user =>
+        user.role === "superadmin"
+    );
+
+  renderUsers(superadmins);
+
+}
+function showAgents() {
+
+  let agents =
+    allUsers.filter(
+      user =>
+        user.role === "agent"
+    );
+
+  renderUsers(agents);
+
+}
+
+
+async function makeAdmin(email) {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/make-admin`,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+
+            currentUser:
+              localStorage.getItem(
+                "userEmail"
+              ),
+
+            targetEmail:
+              email
+
+          })
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(data.message);
+
+    loadUsers();
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+async function makeSuperadmin(email) {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/make-superadmin`,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+
+            currentUser:
+              localStorage.getItem(
+                "userEmail"
+              ),
+
+            targetEmail:
+              email
+
+          })
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(data.message);
+
+    loadUsers();
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+async function removeSuperadmin(email) {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/remove-superadmin`,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+
+            currentUser:
+              localStorage.getItem(
+                "userEmail"
+              ),
+
+            targetEmail:
+              email
+
+          })
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(data.message);
+
+    loadUsers();
+
+  }
+
+  catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+async function removeAdmin(email) {
+
+  try {
+
+    let res =
+      await fetch(
+        `${API_ROOT}/remove-admin`,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+
+            currentUser:
+              localStorage.getItem(
+                "userEmail"
+              ),
+
+            targetEmail:
+              email
+
+          })
+        }
+      );
+
+    let data =
+      await res.json();
+
+    showToast(data.message);
+
+    loadUsers();
+
+  } catch(err) {
+
+    console.log(err);
+
+  }
+
+}
+
+
+
+document
+  .getElementById("userSearch")
+  .addEventListener(
+    "input",
+    e => {
+
+      let search =
+        e.target.value
+          .toLowerCase();
+
+      let filtered =
+  allUsers.filter(user =>
+
+    (user.name || "")
+      .toLowerCase()
+      .includes(search)
+
+    ||
+
+    user.email
+      .toLowerCase()
+      .includes(search)
+
+    ||
+
+    user.role
+      .toLowerCase()
+      .includes(search)
+
+  );
+      renderUsers(filtered);
+
+    }
+  );
+  function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+ loadUsers();
+loadDashboard();
+</script>
+<div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>

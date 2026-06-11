@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+  <main class="mx-auto max-w-6xl px-5 py-8">
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-orange-200">Admin</p>
+        <h1 class="text-4xl font-black text-orange-400">Analytics Dashboard</h1>
+      </div>
+      <button onclick="location.href='management.html'" class="rounded-xl bg-white/10 px-4 py-2">Management</button>
+      <button
+onclick="sendAnalyticsReport()"
+class="rounded-xl bg-green-600 px-4 py-2 font-bold">
+
+📧 Send Report
+
+</button>
+    </div>
+
+    <section id="cards"
+class="mb-6 grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+</section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <h2 class="mb-4 text-xl font-bold text-orange-200">Daily Orders</h2>
+        <canvas id="ordersChart"></canvas>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <h2 class="mb-4 text-xl font-bold text-orange-200">Revenue</h2>
+        <canvas id="revenueChart"></canvas>
+
+        <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+  <h2 class="mb-4 text-xl font-bold text-orange-200">
+    Order Status
+  </h2>
+
+  <canvas id="statusChart"></canvas>
+</div>
+
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5 lg:col-span-2">
+        <h2 class="mb-4 text-xl font-bold text-orange-200">Most Sold Food Items</h2>
+        <canvas id="itemsChart"></canvas>
+      </div>
+    </section>
+    <section
+class="mt-8 rounded-3xl border border-white/10 bg-white/10 p-5">
+
+  <h2
+  class="mb-5 text-2xl font-black text-orange-300">
+
+    Recent Orders
+
+  </h2>
+
+  <div id="recentOrders">
+
+  </div>
+
+</section>
+
+  </main>
+
+  <script>
+    const API_ROOT = "http://localhost:3000";
+    const role = localStorage.getItem("userRole");
+    
+
+    if (!["admin", "superadmin"].includes(role)) {
+      showToast("Admin only", "error");
+      location.href = "index.html";
+    }
+
+    let chartInstances = {};
+let statusChartInstance = null;
+function makeChart(
+  id,
+  type,
+  labels,
+  values,
+  label,
+  color
+) {
+
+  if (chartInstances[id]) {
+
+    chartInstances[id].destroy();
+
+  }
+
+  chartInstances[id] = new Chart(
+
+    document.getElementById(id),
+
+    {
+
+      type,
+
+      data: {
+
+        labels,
+
+        datasets: [{
+
+          label,
+
+          data: values,
+
+          backgroundColor: color,
+
+          borderColor: color,
+
+          borderWidth: 2
+
+        }]
+
+      },
+
+      options: {
+
+        responsive: true,
+
+        plugins: {
+
+          legend: {
+
+            labels: {
+
+              color: "#fff"
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  );
+
+}
+    async function loadAnalytics() {
+      const currentUser = localStorage.getItem("userEmail");
+      const res = await fetch(`${API_ROOT}/analytics?currentUser=${encodeURIComponent(currentUser || "")}`);
+      const data = await res.json();
+      const daily = data.daily || [];
+      const items = data.mostSoldItems || [];
+        const recentOrders =
+data.recentOrders || [];
+      document.getElementById("cards").innerHTML = `
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Total Orders
+  </p>
+
+  <h2 class="text-3xl font-black">
+    ${data.totalOrders || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Revenue
+  </p>
+
+  <h2 class="text-3xl font-black text-green-300">
+    ₹${data.revenue || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Delivered Orders
+  </p>
+
+  <h2 class="text-3xl font-black text-green-400">
+    ${data.deliveredOrders || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Pending Orders
+  </p>
+
+  <h2 class="text-3xl font-black text-yellow-300">
+    ${data.pendingOrders || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Today's Orders
+  </p>
+
+  <h2 class="text-3xl font-black text-cyan-300">
+    ${data.todayOrdersCount || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Today's Revenue
+  </p>
+
+  <h2 class="text-3xl font-black text-emerald-300">
+    ₹${data.todayRevenue || 0}
+  </h2>
+</div>
+
+<div class="rounded-2xl bg-white/10 p-5 md:col-span-2">
+  <p class="text-slate-300">
+    Best Seller
+  </p>
+
+  <h2 class="text-2xl font-black text-orange-300">
+    ${items[0]?.name || "No sales yet"}
+  </h2>
+
+  <p class="mt-2 text-slate-400">
+    Sold ${items[0]?.quantity || 0} times
+  </p>
+</div>
+<div class="rounded-2xl bg-white/10 p-5">
+  <p class="text-slate-300">
+    Delivery Success
+  </p>
+
+  <h2 class="text-3xl font-black text-green-400">
+    ${data.deliveryRate || 0}%
+  </h2>
+</div>
+
+`;
+      makeChart("ordersChart", "line", daily.map(day => day.label), daily.map(day => day.orders), "Orders", "#fb923c");
+      makeChart("revenueChart", "bar", daily.map(day => day.label), daily.map(day => day.revenue), "Revenue", "#22c55e");
+      makeChart("itemsChart", "bar", items.map(item => item.name), items.map(item => item.quantity), "Quantity Sold", "#facc15");
+      const preparingOrders =
+  data.preparingOrders || 0;
+
+const onTheWayOrders =
+  data.onTheWayOrders || 0;
+
+const deliveredOrders =
+  data.deliveredOrders || 0;
+
+if (statusChartInstance) {
+
+  statusChartInstance.destroy();
+
+}
+
+statusChartInstance = new Chart(
+
+  document.getElementById(
+    "statusChart"
+  ),
+
+  {
+
+    type: "pie",
+
+    data: {
+
+      labels: [
+
+        "Preparing",
+
+        "On The Way",
+
+        "Delivered"
+
+      ],
+
+      datasets: [{
+
+        data: [
+
+          preparingOrders,
+
+          onTheWayOrders,
+
+          deliveredOrders
+
+        ],
+
+        backgroundColor: [
+
+          "#facc15",
+
+          "#3b82f6",
+
+          "#22c55e"
+
+        ]
+
+      }]
+
+    },
+
+    options: {
+
+      responsive: true,
+
+      plugins: {
+
+        legend: {
+
+          labels: {
+
+            color: "#ffffff"
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+);
+document.getElementById(
+  "recentOrders"
+).innerHTML =
+
+recentOrders.length
+
+? recentOrders.map(order => `
+
+<div
+class="mb-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+
+  <div class="flex justify-between">
+
+    <div>
+
+      <p class="font-bold text-orange-300">
+
+        #${order.id.slice(-6)}
+
+      </p>
+
+      <p class="text-sm text-slate-300">
+
+        ${order.user}
+
+      </p>
+
+    </div>
+
+    <div class="text-right">
+
+      <p class="font-bold text-green-300">
+
+        ₹${order.total}
+
+      </p>
+
+      <p class="text-sm">
+
+        ${order.status}
+
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+`).join("")
+
+: `
+
+<p class="text-slate-400">
+
+No recent orders found
+
+</p>
+
+`;
+
+    }
+
+    async function sendAnalyticsReport() {
+
+  const res = await fetch(
+    `${API_ROOT}/send-analytics-report`,
+    {
+      method: "POST"
+    }
+  );
+
+  const data =
+    await res.json();
+
+  showToast(
+  data.message
+);
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+    loadAnalytics();
+
+setInterval(
+  loadAnalytics,
+  30000
+);
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>

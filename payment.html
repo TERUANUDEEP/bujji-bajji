@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Payment</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    body {
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .selected{
+border:2px solid #22c55e;
+background:rgba(34,197,94,.15);
+box-shadow:0 0 20px rgba(34,197,94,.4);
+transform:scale(1.02);
+}
+
+.toast{
+
+position:fixed;
+
+top:30px;
+
+right:30px;
+
+background:#ef4444;
+
+color:white;
+
+padding:14px 22px;
+
+border-radius:16px;
+
+font-weight:bold;
+
+z-index:9999;
+
+animation:
+slideIn .3s ease,
+fadeOut .3s ease 2.7s forwards;
+
+}
+
+@keyframes slideIn{
+
+from{
+
+opacity:0;
+transform:translateX(50px);
+
+}
+
+to{
+
+opacity:1;
+transform:translateX(0);
+
+}
+
+}
+
+@keyframes fadeOut{
+
+to{
+
+opacity:0;
+
+}
+
+}
+  </style>
+
+</head>
+
+<body class="text-white min-h-screen flex items-center justify-center p-5">
+
+  <!-- 🎥 Background -->
+  <video autoplay muted loop preload="auto"
+    class="fixed top-0 left-0 w-full h-full object-cover -z-10 brightness-75">
+
+    <source src="background.mp4" type="video/mp4">
+
+  </video>
+
+  <!-- 💳 PAYMENT CARD -->
+
+<div
+class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-2xl border border-white/20">
+
+  <h1
+  class="text-4xl font-black text-center mb-8 text-orange-400">
+
+    💳 Secure Payment
+
+  </h1>
+
+  <!-- ORDER SUMMARY -->
+
+  <div
+  class="bg-white/5 rounded-2xl p-5 mb-6 border border-white/10">
+
+    <div
+    class="flex items-center justify-between">
+
+      <div>
+
+        <h2 class="text-xl font-bold">
+
+          🧾 Order Summary
+
+        </h2>
+
+        <p class="text-sm text-gray-300">
+
+          Review your order before payment
+
+        </p>
+
+      </div>
+
+      <div
+      id="paymentTotal"
+      class="text-3xl font-black text-green-400">
+
+        ₹0
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CASH ON DELIVERY -->
+
+  <div
+  id="cod"
+  onclick="selectPayment('Cash on Delivery 💵')"
+  class="paymentOption bg-white/10 border border-white/10 rounded-2xl p-5 mb-4 cursor-pointer hover:bg-white/20 transition">
+
+    <div class="flex items-center justify-between">
+
+      <div>
+
+        <h2 class="text-xl font-bold">
+
+          💵 Cash On Delivery
+
+        </h2>
+
+        <p class="text-gray-300 text-sm">
+
+          Pay after receiving your order
+
+        </p>
+
+      </div>
+
+      <span class="text-2xl">
+
+        💰
+
+      </span>
+
+    </div>
+
+  </div>
+
+  <!-- UPI PAYMENT -->
+
+  <div
+  id="upi"
+  onclick="selectPayment('UPI 💳')"
+  class="paymentOption bg-white/10 border border-white/10 rounded-2xl p-5 mb-4 cursor-pointer hover:bg-white/20 transition">
+
+    <div class="flex items-center justify-between">
+
+      <div>
+
+        <h2 class="text-xl font-bold">
+
+          💳 UPI Payment
+
+        </h2>
+
+        <p class="text-gray-300 text-sm">
+
+          Google Pay • PhonePe • Paytm • BHIM
+
+        </p>
+
+      </div>
+
+      <span class="text-2xl">
+
+        ⚡
+
+      </span>
+
+    </div>
+
+  </div>
+
+  <!-- PAY BUTTON -->
+
+  <button
+  onclick="continuePayment()"
+  class="w-full bg-green-500 hover:bg-green-600 transition p-4 rounded-2xl font-bold text-xl mt-6">
+
+    Place Order →
+
+  </button>
+
+<p class="text-center text-xs text-gray-300 mt-3">
+
+  🔒 Secure checkout powered by UPI
+
+</p>
+
+  <!-- BACK -->
+
+  <a
+  href="checkout.html"
+  class="block text-center mt-5 text-orange-300 hover:text-orange-200 transition">
+
+    ← Back To Checkout
+
+  </a>
+
+</div>
+
+  <script>
+
+    let selectedMethod = "";
+
+    // 💳 Select Payment
+    function selectPayment(method) {
+
+      selectedMethod = method;
+
+      document.querySelectorAll(".paymentOption")
+        .forEach(el => el.classList.remove("selected"));
+
+      if (method.includes("Cash")) {
+        document.getElementById("cod").classList.add("selected");
+      } else {
+        document.getElementById("upi").classList.add("selected");
+      }
+
+      let total =
+document.getElementById(
+"paymentTotal"
+).innerText;
+
+let btn =
+document.querySelector(
+"button[onclick='continuePayment()']"
+);
+
+if(method.includes("Cash")){
+
+btn.innerText =
+"Place Order →";
+
+}
+else{
+
+btn.innerText =
+`Pay ${total} →`;
+
+}
+
+    }
+
+
+    function loadPaymentTotal(){
+
+let cart =
+JSON.parse(
+localStorage.getItem("cart")
+) || [];
+
+let total = 0;
+
+cart.forEach(item=>{
+
+total +=
+item.price * item.qty;
+
+});
+
+document.getElementById(
+"paymentTotal"
+).innerText =
+`₹${total}`;
+
+}
+
+loadPaymentTotal();
+
+
+    async function continuePayment() {
+
+  if (!selectedMethod) {
+
+    showToast("Please select payment method", "error");
+
+    return;
+
+  }
+
+  localStorage.setItem(
+    "paymentMethod",
+    selectedMethod
+  );
+
+  // 💵 COD
+
+  if (
+    selectedMethod.includes("Cash")
+  ) {
+showToast(
+  "⏳ Payment Successful! Redirecting..."
+);
+ setTimeout(() => {
+
+  console.log(
+    "🚨 PAYMENT PAGE CALLED placeOrder()"
+  );
+
+  placeOrder();
+
+}, 2000);
+    return;
+
+  }
+
+  // 💳 UPI / Razorpay
+
+  try {
+
+    let cart =
+      JSON.parse(
+        localStorage.getItem("cart")
+      ) || [];
+
+    let total = 0;
+
+    cart.forEach(item => {
+
+      total +=
+        item.price * item.qty;
+
+    });
+
+    let response =
+      await fetch(
+        `${API_ROOT}/create-order`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            amount: total
+          })
+        }
+      );
+
+    let order =
+      await response.json();
+
+    let options = {
+
+      key:
+        "rzp_test_SwOskjzy3dkJHe" ,
+
+      amount:
+        order.amount,
+
+      currency:
+        order.currency,
+
+      name:
+        "BUJJI BAJJI",
+
+      description:
+        "Food Order Payment",
+
+      order_id:
+        order.id,
+
+        modal:{
+
+ondismiss:function(){
+
+showToast(
+"⚠ Payment Cancelled"
+);
+
+}
+
+},
+
+    handler:  function(response){
+
+  localStorage.removeItem("invoiceId");
+  localStorage.removeItem("orderId");
+
+  localStorage.setItem(
+    "paymentId",
+    response.razorpay_payment_id
+  );
+
+  localStorage.setItem(
+    "paymentCompleted",
+    "true"
+  );
+showToast(
+  "⏳ Payment Successful! Redirecting..."
+);
+ setTimeout(() => {
+
+  console.log(
+    "🚨 PAYMENT PAGE CALLED placeOrder()"
+  );
+
+  placeOrder();
+
+}, 2000);
+
+}
+    };
+
+    let rzp =
+      new Razorpay(options);
+
+    rzp.open();
+
+  }
+
+  catch(err){
+
+    console.log(err);
+
+   showToast(
+"❌ Payment Failed"
+);
+  }
+
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+    
+  </script>
+  <script src="script.js"></script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+
+</html>

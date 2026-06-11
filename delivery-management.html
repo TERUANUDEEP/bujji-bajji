@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Delivery Management - BUJJI BAJJI</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="min-h-screen bg-slate-950 text-white">
+          <main class="mx-auto max-w-6xl px-5 py-8">
+              <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                            <p class="text-sm uppercase tracking-widest text-orange-200">Admin</p>
+                                    <h1 class="text-4xl font-black text-orange-400">Delivery Management</h1>
+                                    <div
+id="deliveryStats"
+class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+
+</div>
+                                          </div>
+                                                <div class="flex gap-3">
+                                                        <button onclick="location.href='management.html'" class="rounded-xl bg-white/10 px-4 py-2">Management</button>
+                                                                <button onclick="loadData()" class="rounded-xl bg-blue-500 px-4 py-2 font-semibold">Refresh</button>
+                                                                      </div>
+                                                              </div>
+                                                
+                                                                              <section class="grid gap-6 lg:grid-cols-[380px_1fr]">
+                                                                                    <div class="rounded-3xl border border-white/10 bg-white/10 p-6">
+                                                                                            <h2 class="text-2xl font-bold text-orange-300">Create Agent</h2>
+                                                                                                    <div class="mt-5 space-y-3">
+                                                                                                              <input id="agentName" placeholder="Name" class="w-full rounded-xl px-4 py-3 text-slate-950">
+                                                                                                                        <input id="agentEmail" placeholder="Email" class="w-full rounded-xl px-4 py-3 text-slate-950">
+                                                                                                                                  <input id="agentPhone" placeholder="Phone" class="w-full rounded-xl px-4 py-3 text-slate-950">
+                                                                                                                                            <input id="agentPassword" type="password" placeholder="Password" class="w-full rounded-xl px-4 py-3 text-slate-950">
+                                                                                                                                                      <button onclick="createAgent()" class="w-full rounded-xl bg-orange-500 px-4 py-3 font-bold text-black">Create Agent</button>
+                                                                                                                                                              </div>
+                                                                                                                                                                      <div id="agentsList" class="mt-6 space-y-3"></div>
+                                                                                                                                                                            </div>
+                                                                                                                                                                            
+                                                                                                                                                                                  <div class="rounded-3xl border border-white/10 bg-white/10 p-6">
+                                                                                                                                                                                          <h2 class="text-2xl font-bold text-orange-300">Assign Orders</h2>
+   <div class="mt-4 flex gap-3 items-center">
+
+  <input
+  id="searchOrder"
+  placeholder="Search order or customer..."
+  onkeyup="renderOrders()"
+  class="flex-1 rounded-xl px-4 py-3 text-slate-950">
+
+  <select
+
+  id="statusFilter"
+
+  title="Status Filter"
+
+  onchange="renderOrders()"
+
+  class="rounded-xl px-4 py-3 text-slate-950">
+
+    <option value="all">All</option>
+
+    <option value="Preparing">
+      Preparing
+    </option>
+
+    <option value="Out For Delivery">
+      Out For Delivery
+    </option>
+
+    <option value="Delivered">
+      Delivered
+    </option>
+
+  </select>
+
+  <label
+  class="flex items-center gap-2 text-white">
+
+    <input
+
+    type="checkbox"
+
+    id="unassignedOnly"
+
+    onchange="renderOrders()">
+
+    Unassigned Only
+
+  </label>
+
+</div>                                                                                                                                                                                                  <div id="ordersList" class="mt-5 space-y-4"></div>
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                            </section>
+                                                                                                                                                                                                              </main>
+                                                                                                                                                                                                              
+                                                                                                                                                                                                                   <script>
+                                                                                                                                                                                                                    const API_ROOT = "http://localhost:3000";
+                                                                                                                                                                                                                        const role = localStorage.getItem("userRole");
+                                                                                                                                                                                                                            const currentUser = localStorage.getItem("userEmail");
+                                                                                                                                                                                                                                let agents = [];
+                                                                                                                                                                                                                                    let orders = [];
+                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                        if (!["admin", "superadmin"].includes(role)) {
+                                                                                                                                                                                                                                              showToast("Admin only");
+                                                                                                                                                                                                                                                    location.href = "index.html";
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                            async function loadData() {
+                                                                                                                                                                                                                                                                  const [agentsRes, ordersRes] = await Promise.all([
+                                                                                                                                                                                                                                                                          fetch(`${API_ROOT}/agents?currentUser=${encodeURIComponent(currentUser)}`),
+                                                                                                                                                                                                                                                                                  fetch(`${API_ROOT}/orders`)
+                                                                                                                                                                                                                                                                                        ]);
+                                                                                                                                                                                                                                                                                              agents = await agentsRes.json();
+                                                                                                                                                                                                                                                                                                    orders = await ordersRes.json();
+                                                                                                                                                                                                                                                                                                          renderAgents();
+                                                                                                                                                                                                                                                                                                                renderOrders();
+                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                    
+function renderAgents() {
+
+  document.getElementById(
+    "agentsList"
+  ).innerHTML =
+
+  agents.map(agent => {
+
+    const activeOrders =
+
+      orders.filter(order =>
+
+        order.assignedAgent ===
+        agent.email
+
+        &&
+
+        !(
+          order.status || ""
+        ).includes(
+          "Delivered"
+        )
+
+      ).length;
+
+    return `
+
+    <div
+    class="rounded-2xl bg-slate-950/50 p-4 border border-white/10">
+
+      <p
+      class="font-bold text-orange-300">
+
+        ${agent.name}
+
+      </p>
+
+      <p
+      class="text-sm text-slate-300">
+
+        ${agent.email}
+
+      </p>
+
+      <p
+      class="text-sm text-slate-300">
+
+        ${agent.phone || "No phone"}
+
+      </p>
+      <p class="text-sm font-semibold">
+
+  ${
+
+    agent.availability ===
+    "Available"
+
+    ?
+
+    "🟢 Available"
+
+    :
+
+    "🔴 Offline"
+
+  }
+
+</p>
+
+      <div
+      class="mt-3 flex items-center justify-between">
+
+        <span
+        class="text-cyan-300 font-semibold">
+
+          📦 Active Orders
+
+        </span>
+
+        <span
+        class="font-black text-xl text-white">
+
+          ${activeOrders}
+
+        </span>
+
+      </div>
+<button
+
+onclick="deleteAgent('${agent._id}')"
+
+class="mt-3 w-full rounded-xl bg-red-500 px-4 py-2 font-semibold">
+
+  🗑 Delete Agent
+
+</button>
+
+    </div>
+
+    `;
+
+  }).join("")
+
+  ||
+
+  `
+
+  <p class="text-slate-300">
+
+    No agents yet.
+
+  </p>
+
+  `;
+
+}
+
+function getTimerColor(createdAt) {
+
+  const minutes = Math.floor(
+
+    (
+      new Date() -
+      new Date(createdAt)
+    ) / 60000
+
+  );
+
+  if (minutes >= 60) {
+
+    return "text-red-500 font-black animate-pulse";
+
+  }
+
+  if (minutes >= 30) {
+
+    return "text-red-400 font-bold";
+
+  }
+
+  if (minutes >= 15) {
+
+    return "text-yellow-400 font-bold";
+
+  }
+
+  return "text-green-400";
+
+}
+
+function getOrderAge(createdAt) {
+
+  const now =
+    new Date();
+
+  const orderTime =
+    new Date(createdAt);
+
+  const diffMinutes =
+
+    Math.floor(
+
+      (now - orderTime)
+
+      /
+
+      (1000 * 60)
+
+    );
+
+  if (
+    diffMinutes < 60
+  ) {
+
+    return `${diffMinutes} min ago`;
+
+  }
+
+  const diffHours =
+
+    Math.floor(
+      diffMinutes / 60
+    );
+
+  if (
+    diffHours < 24
+  ) {
+
+    return `${diffHours} hr ago`;
+
+  }
+
+  const diffDays =
+
+    Math.floor(
+      diffHours / 24
+    );
+
+  return `${diffDays} day ago`;
+
+}
+function renderOrders() {
+
+
+  const preparingCount =
+
+orders.filter(order =>
+
+  (order.status || "")
+  .includes("Preparing")
+
+).length;
+
+const onTheWayCount =
+
+orders.filter(order =>
+
+  (order.status || "")
+  .includes("Out For Delivery")
+
+).length;
+
+const deliveredCount =
+
+orders.filter(order =>
+
+  (order.status || "")
+  .includes("Delivered")
+
+).length;
+document.getElementById(
+  "deliveryStats"
+).innerHTML = `
+
+<div class="rounded-2xl bg-slate-900/70 p-4">
+
+  <p class="text-slate-400">
+
+    Total Orders
+
+  </p>
+
+  <h2 class="text-3xl font-black text-white">
+
+    ${orders.length}
+
+  </h2>
+
+</div>
+
+<div class="rounded-2xl bg-slate-900/70 p-4">
+
+  <p class="text-slate-400">
+
+    Preparing
+
+  </p>
+
+  <h2 class="text-3xl font-black text-yellow-300">
+
+    ${preparingCount}
+
+  </h2>
+
+</div>
+
+<div class="rounded-2xl bg-slate-900/70 p-4">
+
+  <p class="text-slate-400">
+
+    Out For Delivery
+
+  </p>
+
+  <h2 class="text-3xl font-black text-blue-300">
+
+    ${onTheWayCount}
+
+  </h2>
+
+</div>
+
+<div class="rounded-2xl bg-slate-900/70 p-4">
+
+  <p class="text-slate-400">
+
+    Delivered
+
+  </p>
+
+  <h2 class="text-3xl font-black text-green-300">
+
+    ${deliveredCount}
+
+  </h2>
+
+</div>
+
+`;
+
+ const search =
+
+(
+  document.getElementById(
+    "searchOrder"
+  )?.value || ""
+
+)
+.toLowerCase();
+
+const statusFilter =
+
+document.getElementById(
+  "statusFilter"
+)?.value || "all";
+
+const unassignedOnly =
+
+document.getElementById(
+  "unassignedOnly"
+)?.checked;
+
+const pending =
+
+orders.filter(order => {
+
+  const status =
+
+    order.status || "";
+
+  const matchesSearch =
+
+    (
+      order.user || ""
+    )
+    .toLowerCase()
+    .includes(search)
+
+    ||
+
+    (
+      order._id || ""
+    )
+    .toLowerCase()
+    .includes(search);
+
+  let matchesStatus = true;
+  let matchesAssignment = true;
+
+if (unassignedOnly) {
+
+  matchesAssignment =
+
+    !order.assignedAgent;
+
+}
+
+
+if (statusFilter === "all") {
+
+  matchesStatus =
+
+    !status.includes(
+      "Delivered"
+    );
+
+}
+
+else {
+
+  matchesStatus =
+
+    status
+    .toLowerCase()
+    .includes(
+      statusFilter.toLowerCase()
+    );
+
+}
+
+  return (
+
+  matchesSearch &&
+
+  matchesStatus &&
+
+  matchesAssignment
+
+);
+});
+  document.getElementById(
+    "ordersList"
+  ).innerHTML =
+
+  pending.map(order => {
+
+    let statusColor =
+      "text-yellow-300";
+
+    if (
+      (order.status || "")
+      .includes("On The Way")
+    ) {
+
+      statusColor =
+      "text-blue-300";
+
+    }
+
+    if (
+      (order.status || "")
+      .includes("Delivered")
+    ) {
+
+      statusColor =
+      "text-green-300";
+
+    }
+
+    return `
+
+    <div
+    class="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+
+      <div class="flex flex-wrap justify-between gap-4">
+
+        <div class="space-y-2">
+
+          <div class="flex items-center gap-3">
+
+  <p class="font-bold text-orange-300 text-lg">
+
+    Order #${order._id.slice(-6)}
+
+  </p>
+
+  <span
+class="text-xs ${getTimerColor(order.createdAt)}">
+
+  🕒
+
+  ${getOrderAge(
+    order.createdAt
+  )}
+
+</span>
+
+</div>
+
+          <p class="text-slate-300">
+
+            📧 ${order.user || "No Email"}
+
+          </p>
+
+          <p class="text-slate-300">
+
+            📞 ${order.phone || "No Phone"}
+
+          </p>
+
+          <p class="text-slate-300">
+
+            📍 ${order.address || "No Address"}
+
+          </p>
+
+          <p class="text-green-300">
+
+            💰 ₹${order.total || 0}
+
+          </p>
+
+          <p class="text-cyan-300">
+
+            💳 ${order.payment || "N/A"}
+
+          </p>
+
+          <p class="${statusColor} font-semibold">
+
+            🚚 ${order.status || "Preparing"}
+
+          </p>
+
+          <p class="text-orange-200">
+
+  👨 Assigned:
+
+  ${
+
+    order.assignedAgent
+
+    ?
+
+    agents.find(
+      agent =>
+      agent.email ===
+      order.assignedAgent
+    )?.name
+
+    ||
+
+    order.assignedAgent
+
+    :
+
+    "Not Assigned"
+
+  }
+
+</p>
+
+        </div>
+
+        <div class="flex flex-col gap-3">
+
+  ${order.assignedAgent ? `
+
+    <div
+    class="rounded-xl bg-green-500/20 border border-green-500 p-3 text-center">
+
+      <p class="font-bold text-green-300">
+
+        ✅ Assigned Successfully
+
+      </p>
+
+      <p class="text-sm text-slate-300 mt-1">
+
+        ${order.assignedAgent}
+
+      </p>
+
+    </div>
+    <button
+
+onclick="reassignOrder('${order._id}')"
+
+class="rounded-xl bg-orange-500 px-4 py-2 font-semibold">
+
+  🔄 Reassign
+
+</button>
+
+  ` : `
+
+    <select
+    id="agent-${order._id}"
+    class="rounded-xl px-3 py-2 text-slate-950">
+
+      <option value="">
+
+        Select Agent
+
+      </option>
+
+      ${agents
+
+.filter(agent =>
+
+  agent.availability ===
+  "Available"
+
+)
+
+.map(agent => `
+
+  <option
+  value="${agent.email}">
+
+    ${agent.name}
+
+  </option>
+
+`).join("")}
+
+    </select>
+
+    <button
+
+    onclick="assignOrder('${order._id}')"
+
+    class="rounded-xl bg-green-500 px-4 py-2 font-semibold">
+
+      Assign Agent
+
+    </button>
+
+  `}
+
+</div>
+      </div>
+
+    </div>
+
+    `;
+
+  }).join("")
+
+  ||
+
+  `
+
+  <p class="text-slate-300">
+
+    No active orders.
+
+  </p>
+
+  `;
+
+}                                                                                                                                                                                                                                            
+async function createAgent() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const payload = {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        name: document.getElementById("agentName").value.trim(),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                email: document.getElementById("agentEmail").value.trim(),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        phone: document.getElementById("agentPhone").value.trim(),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                password: document.getElementById("agentPassword").value,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        currentUser
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              };
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const res = await fetch(`${API_ROOT}/agent-register`, {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            method: "POST",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    headers: { "Content-Type": "application/json" },
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            body: JSON.stringify(payload)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const data = await res.json();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           showToast("Agent created successfully");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 loadData();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         async function assignOrder(orderId) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               const agentEmail = document.getElementById(`agent-${orderId}`).value;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     if (!agentEmail) return showToast("Select agent");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           const res = await fetch(`${API_ROOT}/assign-order`, {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   method: "POST",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           headers: { "Content-Type": "application/json" },
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   body: JSON.stringify({ orderId, agentEmail, currentUser })
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               const data = await res.json();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               showToast("Agent assigned successfully");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     loadData();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }
+ async function reassignOrder(orderId) {
+
+  const res = await fetch(
+
+    `${API_ROOT}/reassign-order`,
+
+    {
+
+      method: "POST",
+
+      headers: {
+
+        "Content-Type":
+        "application/json"
+
+      },
+
+      body: JSON.stringify({
+
+        orderId
+
+      })
+
+    }
+
+  );
+
+  const data =
+    await res.json();
+
+  showToast(
+
+    data.message ||
+
+    "Order reassigned"
+
+  );
+
+  loadData();
+
+}
+
+async function deleteAgent(agentId) {
+
+  const ok = confirm(
+
+    "Delete this agent?"
+
+  );
+
+  if (!ok) {
+
+    return;
+
+  }
+
+  const res = await fetch(
+
+    `${API_ROOT}/delete-agent/${agentId}`,
+
+    {
+
+      method: "DELETE"
+
+    }
+
+  );
+
+  const data =
+    await res.json();
+
+  showToast(
+
+    data.message ||
+
+    "Agent deleted"
+
+  );
+
+  loadData();
+
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+setInterval(() => {
+
+  renderOrders();
+
+}, 60000);
+                 
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             loadData();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </body>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               >

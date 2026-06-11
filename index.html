@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0" />
+
+  <title>BUJJI BAJJI</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700;900&display=swap"
+    rel="stylesheet">
+<link rel="icon" href="logo.png">
+  <style>
+
+    body {
+
+      font-family: 'Outfit', sans-serif;
+
+      background: transparent;
+
+      opacity: 0;
+
+      animation: fadeIn 0.4s ease-in forwards;
+
+    }
+
+    .page-label {
+
+      letter-spacing: 0.18em;
+
+      text-transform: uppercase;
+
+    }
+
+    .food-badge {
+
+      background: rgba(255,255,255,0.12);
+
+      border: 1px solid rgba(255,255,255,0.18);
+
+    }
+
+    .logo-title {
+
+  font-family:
+  'DIMSUM',
+  'Arial Black',
+  sans-serif;
+
+}
+
+   .hero-card {
+
+  background:
+  rgba(10,10,10,0.42);
+
+  border:
+  1px solid rgba(255,255,255,0.10);
+
+  -webkit-backdrop-filter:
+  blur(24px);
+
+  backdrop-filter:
+  blur(24px);
+
+  box-shadow:
+  0 10px 40px rgba(0,0,0,0.35);
+
+  transition:
+  transform 0.35s ease,
+  box-shadow 0.35s ease,
+  border 0.35s ease,
+  background 0.35s ease;
+
+}
+
+.hero-card {
+
+  animation:
+  heroFloat 4s ease-in-out infinite;
+
+}
+
+@keyframes heroFloat {
+
+  0% {
+
+    transform:
+    translateY(0px);
+
+  }
+
+  50% {
+
+    transform:
+    translateY(-6px);
+
+  }
+
+  100% {
+
+    transform:
+    translateY(0px);
+
+  }
+
+}
+
+
+.bajji-card {
+
+  background:
+  rgba(8,8,8,0.55);
+
+  -webkit-backdrop-filter:
+  blur(24px);
+
+  backdrop-filter:
+  blur(24px);
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+  0 10px 40px rgba(0,0,0,0.45);
+
+  transition:
+  transform 0.35s ease,
+  box-shadow 0.35s ease,
+  border 0.35s ease,
+  background 0.35s ease;
+
+}
+
+.bajji-card:hover {
+
+  transform:
+  translateY(-10px)
+  scale(1.01);
+
+  box-shadow:
+  0 0 45px rgba(255,115,0,0.25);
+
+  border:
+  1px solid rgba(255,140,0,0.35);
+
+}
+
+
+.bajji-card:hover {
+
+  transform:
+  translateY(-10px)
+  scale(1.01);
+
+  box-shadow:
+  0 0 45px rgba(255,115,0,0.25);
+
+  border:
+  1px solid rgba(255,140,0,0.35);
+
+}
+    @keyframes fadeIn {
+
+      to {
+
+        opacity: 1;
+
+      }
+
+    }
+
+
+    .fire-particle {
+
+  position: fixed;
+
+  bottom: -20px;
+
+  background:
+  radial-gradient(
+    circle,
+    rgba(255,180,0,1) 0%,
+    rgba(255,80,0,0.9) 60%,
+    transparent 100%
+  );
+
+  border-radius: 999px;
+
+  pointer-events: none;
+
+  z-index: 0;
+
+  animation:
+  floatFire linear forwards;
+
+  filter:
+  blur(0.5px);
+
+}
+
+@keyframes floatFire {
+
+  0% {
+
+    transform:
+    translateY(0)
+    scale(1);
+
+    opacity: 0;
+
+  }
+
+  10% {
+
+    opacity: 1;
+
+  }
+
+  100% {
+
+    transform:
+    translateY(-120vh)
+    
+    scale(0);
+
+    opacity: 0;
+
+  }
+
+}
+
+
+#topNavbar {
+
+  transition:
+  transform 0.35s ease,
+  opacity 0.35s ease;
+
+}
+
+  </style>
+
+</head>
+
+<script>
+
+if (
+  localStorage.getItem("isLoggedIn")
+  !== "true"
+) {
+
+  window.location.href =
+    "login.html";
+
+}
+
+</script>
+<body
+  class="bg-transparent text-white overflow-x-hidden">
+
+  <!-- 🎥 Background Video -->
+
+  <video
+    autoplay
+    muted
+    loop
+    preload="auto"
+    class="fixed inset-0 w-full h-full object-cover -z-10 brightness-75">
+
+    <source
+      src="background.mp4"
+      type="video/mp4">
+
+  </video>
+
+  <!-- 🌫 Overlay -->
+
+  <div
+    class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-black/50 pointer-events-none -z-10">
+  </div>
+
+  <!-- 🔥 NAVBAR -->
+
+  <header id="topNavbar"
+    class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
+
+    <div
+class="max-w-7xl mx-auto px-3 py-3
+flex flex-col gap-3
+md:flex-row md:items-center md:justify-between">
+
+      <!-- LEFT: APP NAME & LOGO -->
+       
+
+      <div class="flex items-center gap-3">
+
+        <img
+          src="logo.png"
+          class="w-14 h-14 rounded-full object-cover border-2 border-orange-400 shadow-xl shadow-orange-500/30">
+
+        <h1 class="logo-title text-3xl font-black uppercase tracking-wider text-orange-400">BUJJI BAJJI</h1>
+
+      </div>
+
+      <!-- CENTER: SEARCH & CAMERA -->
+
+      <div class="flex items-center gap-3">
+
+        <!-- 📸 CAMERA -->
+
+        <button
+          onclick="window.location.href='feedback.html'"
+          class="text-2xl hover:scale-110 transition" title="Upload feedback">
+
+          📸
+
+        </button>
+
+        <!-- ❤️ FAVORITES -->
+
+        <button
+          onclick="window.location.href='favourites.html'"
+          class="text-2xl hover:scale-110 transition" title="Favorites">
+
+          ❤️
+
+        </button>
+
+        <!-- 🔍 SEARCH -->
+
+        <div class="relative">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search food..."
+            oninput="searchBajji()"
+            class="w-64 rounded-full border border-white/20 bg-white/90 px-4 py-2 text-slate-900 outline-none shadow-sm">
+
+          <span
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-orange-500">
+
+            🔎
+
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT: ACCOUNT ICON -->
+<div class="flex items-center gap-3">
+
+  <button
+    id="managementBtn"
+    onclick="window.location.href='management.html'"
+    class="hidden rounded-full bg-purple-500/20 px-4 py-2 text-purple-300 border border-purple-500/50 hover:bg-purple-500/50 transition">
+
+    👑 Management
+
+  </button>
+
+  <div class="relative">
+
+   <button
+id="accountAvatar"
+onclick="toggleAccountMenu()"
+class="w-12 h-12 rounded-full bg-orange-500/20 border border-orange-400 flex items-center justify-center text-2xl hover:scale-105 transition"
+title="Account menu">
+
+👤
+
+</button>
+
+    <!-- KEEP THE ENTIRE DROPDOWN MENU BELOW UNCHANGED -->
+
+
+        <!-- DROPDOWN MENU -->
+
+        <div
+          id="accountMenu"
+          class="hidden absolute right-0 top-full mt-4 w-72 rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl backdrop-blur-xl text-white z-50">
+
+          <div
+            class="pb-4 border-b border-white/10">
+
+            <p
+              class="text-xs uppercase text-slate-400">
+
+              Signed in as
+
+            </p>
+
+            <p
+              id="accountName"
+              class="font-semibold truncate mt-1 text-orange-300">
+
+              Guest
+
+            </p>
+
+            <p
+              id="accountEmail"
+              class="text-xs text-slate-400 truncate">
+            </p>
+
+          </div>
+
+          <button
+            onclick="window.location.href='cart.html'"
+            class="w-full mt-3 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            🛒 Cart
+
+          </button>
+
+          <button
+            onclick="window.location.href='history.html'"
+            class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            📜 Order History
+
+          </button>
+          
+          <button
+  onclick="window.location.href='addresses.html'"
+  class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+  📍 Saved Addresses
+
+</button>
+
+          <button
+            onclick="window.location.href='feedback.html'"
+            class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            📸 Community Feed
+
+          </button>
+
+          <button
+            onclick="showChangeAvatarDialog()"
+            class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            🖼 Change Avatar
+
+          </button>
+
+          <button
+            onclick="showChangeEmailDialog()"
+            class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            📧 Change Email
+
+          </button>
+
+          <button
+            onclick="showComplaintDialog()"
+            class="w-full mt-2 rounded-2xl bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+
+            ⚠️ Complaint
+
+          </button>
+
+          <button
+            onclick="logout()"
+            class="mt-4 w-full rounded-2xl bg-orange-500 px-4 py-3 text-black font-semibold hover:bg-orange-600">
+
+            Logout
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- 🔥 MAIN -->
+
+  <main
+    class="mx-auto max-w-7xl px-4 pb-32 pt-8">
+
+    <section class="space-y-8">
+
+      <div
+        class="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
+
+        <!-- LEFT -->
+
+        <div class="space-y-5">
+
+          <span
+            class="page-label text-orange-100 bg-white/10 inline-flex px-4 py-2 rounded-full">
+
+            Fresh • Crisp • Spicy
+
+          </span>
+
+          <h2
+            class="text-4xl font-black leading-tight text-white">
+
+            Welcome back to BUJJI BAJJI —
+            your premium Andhra street food lounge.
+
+          </h2>
+
+          <p
+            class="max-w-2xl text-orange-100 text-base">
+
+            Browse sizzling favorites,
+            collect hearted picks,
+            and order from our live menu.
+
+          </p>
+
+          <!-- HERO BUTTONS -->
+
+          <div
+class="hero-card rounded-3xl p-6 text-white">
+
+  <p
+  class="text-xs uppercase tracking-[0.2em] opacity-70">
+
+    Explore Menu
+
+  </p>
+
+  <h3
+  class="mt-3 text-2xl font-black">
+
+    🍽️ Hey... What do you wanna have today?
+
+  </h3>
+
+  <p
+  class="mt-3 text-orange-100">
+
+    Fresh bajjis, spicy Andhra snacks,
+    customer favourites and chef specials —
+    everything prepared fresh for you.
+
+  </p>
+
+  <div
+  class="mt-4 flex flex-wrap gap-2">
+
+    <span
+    class="food-badge px-3 py-2 rounded-full text-sm">
+
+      🔥 Fresh Everyday
+
+    </span>
+
+    <span
+    class="food-badge px-3 py-2 rounded-full text-sm">
+
+      🚚 Fast Delivery
+
+    </span>
+
+    <span
+    class="food-badge px-3 py-2 rounded-full text-sm">
+
+      ⭐ Best Sellers
+
+    </span>
+
+  </div>
+
+  <button
+    onclick="scrollToSection('itemGrid')"
+    class="mt-5 rounded-full bg-orange-500 px-5 py-3 font-semibold hover:bg-orange-600 transition">
+
+    Browse Full Menu →
+  </button>
+
+</div>
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="grid gap-4">
+
+          <div
+            class="hero-card rounded-[40px] p-6 text-white shadow-xl">
+
+            <div
+              class="flex items-center justify-between gap-4">
+
+              <div>
+
+                <p
+                  class="text-xs uppercase opacity-70 tracking-[0.18em]">
+
+                  Today's Special
+
+                </p>
+
+                <h3
+id="todaySpecialName"
+class="mt-3 text-3xl font-bold">
+
+Loading...
+
+</h3>
+               <p
+id="todaySpecialDesc"
+class="mt-4 text-sm opacity-85">
+
+Loading...
+
+</p>
+
+              </div>
+
+              <img
+                src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=400&q=80"
+                class="w-28 h-28 rounded-3xl object-cover shadow-xl">
+
+            </div>
+
+            <div
+              class="mt-6 flex gap-3 flex-wrap">
+
+             <span
+id="todaySpecialPrice"
+class="food-badge text-sm px-3 py-2 rounded-full">
+
+₹0
+
+</span>
+
+              <span
+                class="food-badge text-sm px-3 py-2 rounded-full">
+
+                ⭐ 4.8
+
+              </span>
+
+              <span
+                class="food-badge text-sm px-3 py-2 rounded-full">
+
+                🔥 Signature
+
+              </span>
+
+            </div>
+
+            <button
+              onclick="orderTodaySpecial()"
+              
+              class="mt-6 rounded-full bg-orange-500 px-5 py-3 text-sm font-semibold hover:bg-orange-600 transition">
+
+              Order now
+
+            </button>
+
+
+          </div>
+
+          <!-- MINI CARDS -->
+
+          <div
+            class="grid gap-4 sm:grid-cols-2">
+
+            <div
+              class="hero-card rounded-3xl p-5">
+
+              <p class="text-xs uppercase opacity-70">
+                Welcome back
+              </p>
+
+              <p
+                id="userName"
+                class="mt-3 text-2xl font-semibold">
+
+                Chef
+
+              </p>
+
+            </div>
+
+            <button
+              onclick="window.location.href='favourites.html'"
+              class="hero-card rounded-3xl p-5 hover:-translate-y-1 transition">
+
+              <p class="text-xs uppercase opacity-70">
+                Favorites
+              </p>
+
+              <p
+                id="favoriteCount"
+                class="mt-3 text-2xl font-semibold">
+
+                0
+
+              </p>
+
+            </button>
+
+            <div
+              onclick="window.location.href='cart.html'"
+              class="hero-card rounded-3xl p-5 cursor-pointer hover:-translate-y-1 transition sm:col-span-2">
+
+              <p class="text-xs uppercase opacity-70">
+                Cart
+              </p>
+
+              <p
+                id="cartCountHero"
+                class="mt-3 text-2xl font-semibold">
+
+                0
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- CATEGORY BAR -->
+
+      <div
+        id="categoryBar"
+        class="flex flex-wrap gap-3">
+      </div>
+
+    </section>
+
+    <!-- ITEMS -->
+
+    <section
+      id="itemGrid"
+      class="mt-10 grid gap-6 xl:grid-cols-3 lg:grid-cols-2">
+    </section>
+
+  </main>
+
+  <!-- 👨‍💼 ADMIN ADD ITEM MODAL -->
+
+  <div id="adminModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    
+    <div class="bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-2xl w-full shadow-2xl space-y-6">
+      <h2 class="text-2xl font-bold text-orange-400">➕ Add New Item</h2>
+      
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-orange-200">Item Name</label>
+          <input id="adminItemName" type="text" placeholder="e.g., Vada Pav" class="w-full rounded-2xl bg-white/10 px-4 py-2 text-white border border-white/20 outline-none focus:border-orange-400">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-orange-200">Price (₹)</label>
+          <input id="adminItemPrice" type="number" placeholder="100" class="w-full rounded-2xl bg-white/10 px-4 py-2 text-white border border-white/20 outline-none focus:border-orange-400">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-orange-200">Description</label>
+        <textarea id="adminItemDesc" placeholder="Describe the item..." class="w-full rounded-2xl bg-white/10 px-4 py-2 text-white border border-white/20 outline-none focus:border-orange-400 min-h-20"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-orange-200">Categories (comma-separated)</label>
+        <select
+          id="adminExistingCategory"
+          class="w-full rounded-xl p-3 text-black"
+          aria-label="Select existing category"
+        >
+          <option value="">Select Existing Category</option>
+        </select>
+        <input
+          id="adminCustomCategory"
+          placeholder="Or enter new category"
+          class="w-full rounded-xl p-3 text-black mt-2"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-orange-200">Image URL</label>
+        <input id="adminItemImage" type="text" placeholder="https://..." class="w-full rounded-2xl bg-white/10 px-4 py-2 text-white border border-white/20 outline-none focus:border-orange-400">
+      
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button onclick="submitNewItem()" class="flex-1 rounded-full bg-green-500 px-6 py-3 font-semibold text-white hover:bg-green-600 transition">✅ Save Item</button>
+        <button onclick="closeAdminModal()" class="flex-1 rounded-full bg-red-500 px-6 py-3 font-semibold text-white hover:bg-red-600 transition">❌ Cancel</button>
+      </div>
+    </div>
+    
+  </div>
+
+
+
+  
+
+  <!-- ✏ EDIT ITEM MODAL -->
+
+<div id="editModal"
+class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+
+  <div class="bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-xl w-full shadow-2xl space-y-5">
+
+    <h2 class="text-2xl font-bold text-blue-400">
+      ✏ Edit Item
+    </h2>
+
+    <input
+      type="hidden"
+      id="editItemId">
+
+    <input
+      id="editItemName"
+      placeholder="Item Name"
+      class="w-full rounded-xl p-3 text-black">
+
+    <input
+      id="editItemPrice"
+      type="number"
+      placeholder="Price"
+      class="w-full rounded-xl p-3 text-black">
+
+    <textarea
+      id="editItemDescription"
+      placeholder="Description"
+      class="w-full rounded-xl p-3 text-black"></textarea>
+
+    <div class="flex gap-3">
+
+      <button
+        id="saveEditBtn"
+        class="flex-1 bg-green-500 rounded-xl py-3 font-bold text-white">
+
+        Save Changes
+
+      </button>
+
+      <button
+        onclick="closeEditModal()"
+        class="flex-1 bg-red-500 rounded-xl py-3 font-bold text-white">
+
+        Cancel
+
+      </button>
+
+    </div>
+
+  </div>
+  </div>
+
+
+  <!-- DELETE MODAL -->
+
+<div id="deleteModal"
+class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+
+  <div class="bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
+
+    <h2 class="text-2xl font-bold text-red-400 mb-4">
+      🗑 Delete Item
+    </h2>
+
+    <p class="text-slate-300 mb-6">
+      This action cannot be undone.
+    </p>
+
+    <input
+      type="hidden"
+      id="deleteItemId">
+
+    <div class="flex gap-3">
+
+      <button
+        id="confirmDeleteBtn"
+        class="flex-1 bg-red-500 rounded-xl py-3 font-bold text-white">
+
+        Delete
+
+      </button>
+
+      <button
+        onclick="closeDeleteModal()"
+        class="flex-1 bg-slate-700 rounded-xl py-3 font-bold text-white">
+
+        Cancel
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- BACK TO TOP -->
+
+  <button
+    id="backToTop"
+    onclick="scrollToTop()"
+    class="hidden fixed left-5 bottom-40 z-40 rounded-full bg-orange-500 px-4 py-3 text-white shadow-2xl hover:bg-orange-600 transition">
+
+    ⬆️
+
+  </button>
+  <div class="fixed left-5 bottom-24 z-40">
+
+<button
+onclick="toggleMusicMenu()"
+class="rounded-full bg-purple-500 px-4 py-3 text-white shadow-2xl hover:bg-purple-600 transition">
+
+🎵
+
+</button>
+
+<div
+id="musicMenu"
+class="hidden mt-2 bg-slate-900 rounded-2xl p-3 border border-purple-500 w-44">
+
+<button
+onclick="toggleMusic()"
+class="w-full bg-purple-500 rounded-xl p-2 mb-2 text-white">
+
+▶ Play / Pause
+
+</button>
+
+<button
+onclick="document.getElementById('musicUpload').click()"
+class="w-full bg-blue-500 rounded-xl p-2 mb-2 text-white">
+
+📁 Upload Music
+
+</button>
+
+<button
+onclick="resetMusic()"
+class="w-full bg-red-500 rounded-xl p-2 text-white">
+
+🔄 Default Music
+
+</button>
+
+<label for="musicUpload" class="hidden">
+Upload Music
+</label>
+
+<input
+id="musicUpload"
+type="file"
+accept=".mp3,audio/*"
+title="Upload Music"
+class="hidden"
+onchange="uploadMusic(event)">
+
+</div>
+
+</div>
+  <!-- FLOATING CART -->
+
+  <a
+    href="cart.html"
+    class="fixed bottom-28 right-5 z-50 rounded-full bg-orange-500 px-5 py-5 text-white shadow-2xl hover:scale-110 transition">
+
+    🛒
+
+    <span
+      id="cartCount"
+      class="absolute -top-2 -right-2 rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
+
+      0
+
+    </span>
+
+  </a>
+
+  <!-- BOTTOM NAV -->
+
+  <div
+    class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-white/10 z-40">
+
+    <div
+      class="max-w-7xl mx-auto flex items-center justify-around px-4 py-3 text-slate-900">
+
+      <a
+        href="index.html"
+        class="font-bold text-orange-500">
+
+        🏠 Home
+
+      </a>
+
+      <a href="cart.html">
+
+        🛒 Cart
+
+      </a>
+
+      <a href="history.html">
+
+        📜 History
+
+      </a>
+
+      <a href="feedback.html">
+
+        📸 Feedback
+
+      </a>
+
+      <a href="favourites.html">
+
+        ❤️ Favorites
+
+      </a>
+
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+
+
+  <script>
+
+function createFireParticle() {
+
+  let particle =
+    document.createElement("div");
+
+  particle.className =
+    "fire-particle";
+
+  particle.style.left =
+    Math.random() * window.innerWidth + "px";
+
+  particle.style.animationDuration =
+    3 + Math.random() * 4 + "s";
+
+  particle.style.opacity =
+    Math.random();
+
+  particle.style.width =
+    particle.style.height =
+    2 + Math.random() * 6 + "px";
+
+  document.body.appendChild(
+    particle
+  );
+
+  setTimeout(() => {
+
+    particle.remove();
+
+  }, 7000);
+
+}
+
+setInterval(
+  createFireParticle,
+  120
+);
+
+</script>
+
+<script>
+
+let lastScrollY = window.scrollY;
+
+const navbar =
+document.getElementById(
+  "topNavbar"
+);
+
+window.addEventListener(
+  "scroll",
+
+  () => {
+
+    if (
+      window.scrollY >
+      lastScrollY
+    ) {
+
+      // 🔥 scrolling down
+      navbar.style.transform =
+      "translateY(-120%)";
+
+      navbar.style.opacity =
+      "0";
+
+    }
+
+    else {
+
+      // 🔥 scrolling up
+      navbar.style.transform =
+      "translateY(0)";
+
+      navbar.style.opacity =
+      "1";
+
+    }
+
+    lastScrollY =
+    window.scrollY;
+
+  }
+
+);
+let verifiedEmailOtp = false;
+
+async function sendEmailChangeOtp(){
+
+const currentEmail =
+localStorage.getItem(
+"userEmail"
+);
+
+const res =
+await fetch(
+`${API_ROOT}/send-email-otp`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+email:currentEmail
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+showToast(
+"OTP sent to current email"
+);
+
+}
+
+}
+async function verifyAndChangeEmail(){
+
+const currentEmail =
+localStorage.getItem(
+"userEmail"
+);
+
+const newEmail =
+document.getElementById(
+"newEmail"
+).value;
+
+const otp =
+document.getElementById(
+"emailOtp"
+).value;
+
+const verifyRes =
+await fetch(
+`${API_ROOT}/verify-email-otp`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+
+email:currentEmail,
+
+otp
+
+})
+}
+);
+
+const verifyData =
+await verifyRes.json();
+
+if(!verifyData.success){
+
+showToast(
+"Invalid OTP",
+"error"
+);
+
+return;
+
+}
+
+const changeRes =
+await fetch(
+`${API_ROOT}/change-email`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+
+currentEmail,
+
+newEmail
+
+})
+}
+);
+
+const changeData =
+await changeRes.json();
+
+if(changeData.success){
+
+localStorage.setItem(
+"userEmail",
+newEmail
+);
+
+showToast(
+"Email updated successfully"
+);
+
+setTimeout(()=>{
+
+location.reload();
+
+},1500);
+
+}
+
+}
+async function changeAvatar(avatar){
+
+const email =
+localStorage.getItem(
+"userEmail"
+);
+
+const res =
+await fetch(
+`${API_ROOT}/user/profile`,
+{
+method:"PUT",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+
+email,
+
+avatar
+
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.avatar){
+
+localStorage.setItem(
+"userAvatar",
+avatar
+);
+
+showToast(
+"Avatar Updated"
+);
+
+setTimeout(()=>{
+
+location.reload();
+
+},1000);
+
+}
+
+}
+
+async function uploadCustomAvatar(event){
+
+const file =
+event.target.files[0];
+
+if(!file) return;
+
+try{
+
+const formData =
+new FormData();
+
+formData.append(
+"file",
+file
+);
+
+formData.append(
+"upload_preset",
+"bujji_bajji_uploads"
+);
+
+const cloudinaryRes =
+await fetch(
+
+"https://api.cloudinary.com/v1_1/dgsyc8r31/image/upload",
+
+{
+method:"POST",
+body:formData
+}
+
+);
+
+const cloudinaryData =
+await cloudinaryRes.json();
+
+if(!cloudinaryData.secure_url){
+
+showToast(
+"Upload failed ❌"
+);
+
+return;
+
+}
+
+await changeAvatar(
+cloudinaryData.secure_url
+);
+
+}
+catch(err){
+
+console.log(err);
+
+showToast(
+"Upload failed ❌"
+);
+
+}
+
+}
+window.addEventListener(
+"DOMContentLoaded",
+() => {
+
+const savedAvatar =
+localStorage.getItem(
+"userAvatar"
+);
+
+const avatarBtn =
+document.getElementById(
+"accountAvatar"
+);
+
+if(
+savedAvatar &&
+avatarBtn
+){
+
+avatarBtn.innerHTML = `
+<img
+src="${savedAvatar}"
+class="w-full h-full rounded-full object-cover">
+`;
+
+}
+
+});
+const dailySpecials = {
+
+  0: {
+    name: "Chocolate Cake",
+    price: 90,
+    desc: "Sunday Sweet Special 🍰"
+  },
+
+  1: {
+    name: "Paneer Bajji",
+    price: 55,
+    desc: "Monday Special 🔥"
+  },
+
+  2: {
+    name: "Mirchi Bajji",
+    price: 40,
+    desc: "Tuesday Special 🌶️"
+  },
+
+  3: {
+    name: "Punugulu",
+    price: 45,
+    desc: "Wednesday Special 😋"
+  },
+
+  4: {
+    name: "Gobi Pakoda",
+    price: 50,
+    desc: "Thursday Special 🍽️"
+  },
+
+  5: {
+    name: "Chicken Biryani",
+    price: 120,
+    desc: "Friday Special 🍗"
+  },
+
+  6: {
+    name: "Cheese Pizza",
+    price: 150,
+    desc: "Saturday Special 🍕"
+  }
+
+};
+
+const today =
+new Date().getDay();
+
+const special =
+dailySpecials[today];
+
+document.getElementById(
+  "todaySpecialName"
+).innerText =
+special.name;
+
+document.getElementById(
+  "todaySpecialDesc"
+).innerText =
+special.desc;
+
+document.getElementById(
+  "todaySpecialPrice"
+).innerText =
+`₹${special.price}`;
+function orderTodaySpecial() {
+
+  addToCart(
+
+    special.name,
+
+    special.price,
+
+    "logo.png"
+
+  );
+
+  showToast(
+    `${special.name} added to cart 🛒`
+  );
+
+}
+</script>
+
+<div
+id="complaintModal"
+class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+
+<div
+class="bg-slate-950 border border-orange-500 rounded-3xl p-6 w-80 text-center">
+
+<h2
+class="text-2xl font-bold text-orange-400 mb-5">
+
+⚠️ Complaint Support
+
+</h2>
+
+<button
+
+onclick="window.open('https://wa.me/919381107534','_blank')"
+
+class="w-full bg-green-500 hover:bg-green-600 rounded-xl py-3 font-bold mb-3">
+
+📱 WhatsApp Support
+
+</button>
+
+<button
+
+onclick="window.location.href='mailto:teruanudeep987@gmail.com'"
+
+class="w-full bg-blue-500 hover:bg-blue-600 rounded-xl py-3 font-bold mb-3">
+
+📧 Email Support
+
+</button>
+
+<button
+
+onclick='document.getElementById("complaintModal").classList.add("hidden")'
+
+class="w-full bg-red-500 hover:bg-red-600 rounded-xl py-3 font-bold">
+
+❌ Close
+
+</button>
+
+</div>
+
+</div>
+
+<div
+id="changeEmailModal"
+class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+
+<div
+class="bg-slate-900 p-6 rounded-3xl w-96">
+
+<h2
+class="text-2xl font-bold text-orange-400 mb-4">
+
+📧 Change Email
+
+</h2>
+
+<input
+id="newEmail"
+type="email"
+placeholder="New Email"
+class="w-full p-3 rounded-xl text-black mb-3">
+
+<input
+id="emailOtp"
+type="text"
+placeholder="OTP"
+class="w-full p-3 rounded-xl text-black mb-3">
+
+<button
+
+onclick="sendEmailChangeOtp()"
+
+class="w-full bg-blue-500 rounded-xl p-3 font-bold mb-3">
+
+Send OTP
+
+</button>
+
+<button
+
+onclick="verifyAndChangeEmail()"
+
+class="w-full bg-green-500 rounded-xl p-3 font-bold mb-3">
+
+Reset Email
+
+</button>
+
+<button
+
+onclick='document.getElementById("changeEmailModal").classList.add("hidden")'
+
+class="w-full bg-red-500 rounded-xl p-3 font-bold">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+<div
+id="avatarModal"
+class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+
+<div
+class="bg-slate-900 p-6 rounded-3xl w-[500px]">
+
+<h2
+class="text-2xl font-bold text-orange-400 mb-5 text-center">
+
+🖼 Choose Avatar
+
+</h2>
+
+<div
+class="grid grid-cols-3 gap-4">
+
+<img
+src="images/avatars/avatar1.png"
+onclick="changeAvatar('images/avatars/avatar1.png')"
+class="w-24 h-24 rounded-full cursor-pointer border-2 border-transparent hover:border-green-400">
+
+<img
+src="images/avatars/avatar2.png"
+onclick="changeAvatar('images/avatars/avatar2.png')"
+class="w-24 h-24 rounded-full cursor-pointer border-2 border-transparent hover:border-green-400">
+
+<img
+src="images/avatars/avatar3.png"
+onclick="changeAvatar('images/avatars/avatar3.png')"
+class="w-24 h-24 rounded-full cursor-pointer border-2 border-transparent hover:border-green-400">
+
+<img
+src="images/avatars/avatar4.png"
+onclick="changeAvatar('images/avatars/avatar4.png')"
+class="w-24 h-24 rounded-full cursor-pointer border-2 border-transparent hover:border-green-400">
+
+<img
+src="images/avatars/avatar5.png"
+onclick="changeAvatar('images/avatars/avatar5.png')"
+class="w-24 h-24 rounded-full cursor-pointer border-2 border-transparent hover:border-green-400">
+
+</div>
+<div class="mt-6">
+
+<label
+for="avatarUpload"
+class="block text-center bg-blue-500 hover:bg-blue-600 rounded-xl py-3 font-bold cursor-pointer">
+
+📷 Upload Your Own Avatar
+
+</label>
+
+<input
+id="avatarUpload"
+type="file"
+accept="image/*"
+class="hidden"
+onchange="uploadCustomAvatar(event)">
+
+</div>
+<button
+
+onclick='document.getElementById("avatarModal").classList.add("hidden")'
+
+class="w-full mt-5 bg-red-500 rounded-xl py-3 font-bold">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+
+</html>

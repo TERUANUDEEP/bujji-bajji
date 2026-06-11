@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUJJI BAJJI Invoice</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen p-8 bg-gradient-to-br from-[#8b0000] to-[#c1121f]">
+
+<div id="invoiceContainer" class="max-w-[1600px] mx-auto bg-[#fffaf2] rounded-3xl shadow-2xl overflow-hidden">
+
+<div class="flex justify-between items-start">
+  <div class="flex items-center gap-8">
+    <img src="logo.png" class="w-40 h-40 object-contain">
+    <div>
+      <h1 class="text-8xl font-black text-red-800 leading-none">BUJJI BAJJI</h1>
+      <p class="text-4xl font-bold text-green-700 mt-3">Crispy Outside. Happy Inside.</p>
+    </div>
+  </div>
+  <div class="bg-red-700 text-white px-10 py-6 rounded-bl-3xl shadow-xl">
+    <h2 class="text-4xl font-black">INVOICE</h2>
+  </div>
+</div>
+
+<!-- DETAILS SECTION -->
+<div class="grid grid-cols-3 gap-8 px-10 pb-10">
+
+<div class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+<h2 class="text-2xl font-bold text-red-700 mb-4">📋 Invoice Details</h2>
+<div id="invoiceDetails"></div>
+</div>
+
+<div class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+<h2 class="text-2xl font-bold text-red-700 mb-4">📍 Delivery Details</h2>
+<div id="deliveryDetails"></div>
+</div>
+
+<div class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+<h2 class="text-2xl font-bold text-red-700 mb-4">🔳 Verify Order</h2>
+<div id="qrContainer"></div>
+</div>
+
+</div>
+
+<!-- ITEMS -->
+<div class="px-8">
+<h2 class="text-3xl font-black text-red-700 mb-4">🍽 Items Ordered</h2>
+<table class="w-full table-fixed overflow-hidden rounded-3xl">
+<thead>
+<tr class="bg-red-700 text-white">
+<th class="w-16 p-4">#</th>
+<th class="w-32 p-4">Image</th>
+<th class="p-4 text-left">Item</th>
+<th class="w-32 p-4">Price</th>
+<th class="w-24 p-4">Qty</th>
+<th class="w-32 p-4">Total</th>
+</tr>
+</thead>
+<tbody id="itemsTable" class="bg-white"></tbody>
+</table>
+</div>
+
+<!-- SUMMARY -->
+<div class="grid grid-cols-2 gap-6 p-8">
+
+<div class="border-2 border-orange-200 rounded-3xl p-6 min-h-[220px]">
+<h2 class="text-2xl font-bold text-red-700 mb-4">🧾 Order Summary</h2>
+<div id="summaryBox"></div>
+</div>
+
+<div class="border-2 border-green-300 rounded-3xl p-6">
+<h2 class="text-2xl font-bold text-green-700 mb-4">🚚 Track Order</h2>
+<div id="trackingBox"></div>
+</div>
+
+</div>
+
+<!-- SUPPORT -->
+<div class="grid grid-cols-3 gap-6 p-8">
+
+<div class="bg-white border-2 border-orange-200 rounded-3xl p-6 shadow-sm">
+<h3 class="font-bold text-green-700 text-xl">WhatsApp Support</h3>
+<a href="https://wa.me/919381107534" target="_blank" rel="noopener noreferrer" class="text-lg font-semibold text-green-700 hover:underline">+91 9381107534</a>
+</div>
+
+<div class="bg-white border-2 border-orange-200 rounded-3xl p-6 shadow-sm">
+<h3 class="font-bold text-red-700 text-xl">Email Support</h3>
+<a href="mailto:teruanudeep987@gmail.com" class="text-lg font-semibold text-red-700 hover:underline">teruanudeep987@gmail.com</a>
+</div>
+
+<div class="border rounded-2xl p-4 min-h-[220px]">
+<h3 class="font-bold text-orange-700 text-xl">Feedback QR</h3>
+<div id="feedbackQR"></div>
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="bg-red-800 text-white text-center py-6">
+<h2 class="text-3xl font-bold">Thank you for choosing BUJJI BAJJI!</h2>
+<p class="mt-2">Your love keeps us frying 😊</p>
+</div>
+
+</div>
+
+<!-- DOWNLOAD BUTTON -->
+<div class="max-w-[1600px] mx-auto mt-6 text-center">
+<button onclick="downloadInvoicePDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition">📥 Download Invoice PDF</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+const API_ROOT = "http://localhost:3000";
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get("id");
+
+if (!orderId) {
+  document.body.innerHTML = '<div style="text-align:center; margin-top:50px; color:red; font-size:24px;">No Order ID provided. Please use invoice-db.html?id=ORDER_ID</div>';
+} else {
+  loadOrderFromDB(orderId);
+}
+
+async function loadOrderFromDB(id) {
+  try {
+    const res = await fetch(`${API_ROOT}/order/${id}`);
+    if (!res.ok) throw new Error("Order not found");
+
+    const order = await res.json();
+    renderInvoice(order);
+  } catch (err) {
+    console.error("Error loading order:", err);
+    document.getElementById("invoiceDetails").innerHTML = '<p style="color:red;">Error loading order</p>';
+  }
+}
+
+function renderInvoice(order) {
+ const orderId = order._id.toString();
+
+const invoiceId =
+  `INV-${orderId.substring(orderId.length - 6).toUpperCase()}`;
+  const items = order.items || [];
+  const total = order.total || 0;
+
+  // Invoice Details
+  document.getElementById("invoiceDetails").innerHTML = `
+    <p><b>Invoice ID:</b> ${invoiceId}</p>
+    <p><b>Order ID:</b> ${order._id}</p>
+    <p class="mt-2"><b>Date:</b> ${new Date(order.createdAt).toLocaleString()}</p>
+    <p class="mt-2"><b>Status:</b> <span class="bg-blue-600 text-white px-4 py-1 rounded-full font-bold">${order.status || 'Pending'}</span></p>
+    <p class="mt-2"><b>Payment:</b> ${order.payment || 'N/A'}</p>
+  `;
+
+  // Delivery Details
+  document.getElementById("deliveryDetails").innerHTML = `
+    <p class="font-bold text-red-700 text-lg">${order.user || 'Guest'}</p>
+    <p class="mt-2">📞 ${order.phone || 'N/A'}</p>
+    <p class="mt-2">📍 ${order.address || 'N/A'}</p>
+  `;
+
+  // Items Table
+  let itemsHTML = '';
+  items.forEach((item, index) => {
+    console.log("INVOICE ITEM:", item);
+    itemsHTML += `
+      <tr class="border-b h-28">
+        <td class="p-4 text-center">${index + 1}</td>
+        <td class="p-4 text-center"><img src="${item.img || item.image || 'https://via.placeholder.com/80'}" class="w-20 h-20 rounded-xl object-cover mx-auto"></td>
+        <td class="p-4"><span class="font-bold text-2xl text-gray-800">${item.name}</span></td>
+        <td class="p-4 text-center">₹${item.price}</td>
+        <td class="p-4 text-center">${item.qty}</td>
+        <td class="p-4 text-center">₹${item.price * item.qty}</td>
+      </tr>
+    `;
+  });
+  document.getElementById("itemsTable").innerHTML = itemsHTML;
+
+  // Summary
+  document.getElementById("summaryBox").innerHTML = `
+    <div class="space-y-3 text-xl">
+      <div class="flex justify-between">
+        <span>Subtotal</span>
+        <span>₹${total}</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Delivery</span>
+        <span>₹0</span>
+      </div>
+      <div class="flex justify-between">
+        <span>Discount</span>
+        <span>₹0</span>
+      </div>
+      <hr>
+      <div class="flex justify-between font-black text-3xl text-red-700">
+        <span>Total</span>
+        <span>₹${total}</span>
+      </div>
+    </div>
+  `;
+
+  // Tracking
+  document.getElementById("trackingBox").innerHTML = `
+    <p class="text-lg">Track your order in real time.</p>
+    <a href="tracking.html?id=${order._id}" class="block mt-4 bg-green-700 text-white text-center rounded-xl py-3 font-bold hover:bg-green-800 transition">🚚 Track Order</a>
+    <p class="mt-4">Estimated Delivery</p>
+    <p class="text-3xl font-black text-red-700">20 - 30 Minutes</p>
+  `;
+
+  // Verify QR
+  const verifyData = JSON.stringify({
+    orderId: order._id,
+    customer: order.user,
+    phone: order.phone,
+    total: total
+  });
+
+  QRCode.toCanvas(verifyData, { width: 220 }, (err, canvas) => {
+    if (!err) {
+      const box = document.getElementById("qrContainer");
+      box.innerHTML = '';
+      box.appendChild(canvas);
+      const info = document.createElement("div");
+      info.innerHTML = `
+        <p class="mt-4 font-bold">Order Verification QR</p>
+        <p class="text-sm text-gray-500">Scan in BUJJI BAJJI App</p>
+        <p class="text-xs text-gray-500 mt-2">For Customer & Delivery Partner Verification</p>
+        <p class="text-xs mt-2">${order._id}</p>
+      `;
+      box.appendChild(info);
+    }
+  });
+
+  // Feedback QR
+  const userPhone = order.phone ? (order.phone.startsWith('91') ? order.phone : '91' + order.phone) : '919381107534';
+  const feedbackLink = `https://wa.me/${userPhone}?text=Hello%20BUJJI%20BAJJI%20Team%2C%20I%20have%20feedback%20about%20my%20order`;
+
+  QRCode.toCanvas(feedbackLink, { width: 120 }, (err, canvas) => {
+    if (!err) {
+      const box = document.getElementById("feedbackQR");
+      box.innerHTML = '';
+      box.appendChild(canvas);
+    }
+  });
+}
+
+async function downloadInvoicePDF() {
+
+  const images =
+    document.querySelectorAll("img");
+
+  await Promise.all(
+    [...images].map(img => {
+
+      if (img.complete)
+        return Promise.resolve();
+
+      return new Promise(resolve => {
+
+        img.onload = resolve;
+        img.onerror = resolve;
+
+      });
+
+    })
+  );
+
+  const element =
+    document.getElementById(
+      "invoiceContainer"
+    );
+
+  const opt = {
+
+    margin: 10,
+
+    filename:
+      `Invoice-${orderId}.pdf`,
+
+    image: {
+      type: "jpeg",
+      quality: 0.98
+    },
+
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true
+    },
+
+    jsPDF: {
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    }
+
+  };
+
+  setTimeout(() => {
+
+  html2pdf()
+    .set(opt)
+    .from(element)
+    .save();
+
+}, 3000);
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+</script>
+<div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>
