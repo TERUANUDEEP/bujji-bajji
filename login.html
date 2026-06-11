@@ -564,7 +564,7 @@ async function loginEmail() {
 
     let res = await fetch(
 
-      "http://localhost:3000/login",
+      "https://bujji-bajji-production.up.railway.app/login",
 
       {
 
@@ -832,7 +832,7 @@ if (!strongPassword.test(password)) {
     
     try {
 
-      let res = await fetch("http://localhost:3000/register", {
+      let res = await fetch("https://bujji-bajji-production.up.railway.app/register", {
 
         method: "POST",
 
@@ -891,7 +891,7 @@ async function sendEmailOTP() {
   try {
 
     let res = await fetch(
-      "http://localhost:3000/send-email-otp",
+      "https://bujji-bajji-production.up.railway.app/send-email-otp",
       {
 
         method: "POST",
@@ -959,7 +959,7 @@ async function resetPassword() {
 
     let res = await fetch(
 
-      "http://localhost:3000/reset-password",
+      "https://bujji-bajji-production.up.railway.app/reset-password",
 
       {
 
@@ -1020,7 +1020,7 @@ async function resetPassword() {
       document.getElementById("email").value;
 
     let res = await fetch(
-      "http://localhost:3000/verify-email-otp",
+      "https://bujji-bajji-production.up.railway.app/verify-email-otp",
       {
 
         method: "POST",

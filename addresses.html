@@ -267,8 +267,8 @@ async function loadAddresses(){
 
   let res =
     await fetch(
-      `http://localhost:3000/addresses/${email}`
-    );
+  `https://bujji-bajji-production.up.railway.app/addresses/${email}`
+);
 
   let addresses =
     await res.json();
