@@ -4097,7 +4097,9 @@ message:
 }
 
 });
-
+app.get("/", (req, res) => {
+  res.send("BUJJI BAJJI BACKEND RUNNING 🚀");
+});
 mongoose.connect(
 process.env.MONGO_URI,
   { serverSelectionTimeoutMS: 5000 }
