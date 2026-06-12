@@ -205,6 +205,23 @@
   blur(0.5px);
 
 }
+@media (max-width: 768px){
+
+  #accountMenu{
+
+    position: fixed !important;
+
+    top: 90px !important;
+
+    left: 15px !important;
+
+    right: 15px !important;
+
+    width: auto !important;
+
+  }
+
+}
 
 @keyframes floatFire {
 
@@ -343,7 +360,7 @@ md:flex-row md:items-center md:justify-between">
             type="search"
             placeholder="Search food..."
             oninput="searchBajji()"
-            class="w-64 rounded-full border border-white/20 bg-white/90 px-4 py-2 text-slate-900 outline-none shadow-sm">
+class="w-40 md:w-64 rounded-full border border-white/20 bg-white/90 px-4 py-2 text-slate-900 outline-none shadow-sm">
 
           <span
             class="absolute right-4 top-1/2 -translate-y-1/2 text-orange-500">
