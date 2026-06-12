@@ -3031,6 +3031,108 @@ app.post("/send-delivery-otp", async (req, res) => {
   }
 
 });
+app.post("/send-email-otp", async (req, res) => {
+
+  try {
+
+    const { email } = req.body;
+
+    const key =
+      email.trim().toLowerCase();
+
+    const user =
+      await User.findOne({
+        email: key
+      });
+
+    if (!user) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Email not registered"
+      });
+
+    }
+
+    const otp = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    otpStore[key] = otp;
+
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
+
+        headers: {
+          "accept": "application/json",
+          "api-key":
+            process.env.BREVO_API_KEY,
+          "content-type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+
+          sender: {
+            name: "BUJJI BAJJI",
+            email:
+              "teruanudeep987@gmail.com"
+          },
+
+          to: [
+            {
+              email: key
+            }
+          ],
+
+          subject:
+            "BUJJI BAJJI Password Reset OTP",
+
+          htmlContent: `
+            <h2>Password Reset OTP</h2>
+
+            <h1>${otp}</h1>
+
+            <p>
+              Use this OTP to reset your password.
+            </p>
+          `
+
+        })
+
+      }
+    );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "PASSWORD RESET OTP:",
+      data
+    );
+
+    res.json({
+      success: true
+    });
+
+  }
+
+  catch (err) {
+
+    console.log(
+      "PASSWORD RESET ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
 app.post("/verify-email-otp", (req, res) => {
   const { email, otp } = req.body;
   const key = email.trim().toLowerCase();
