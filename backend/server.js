@@ -3221,7 +3221,7 @@ try {
 
     to: [
       {
-        email: email
+        email: req.body.email
       }
     ],
 
