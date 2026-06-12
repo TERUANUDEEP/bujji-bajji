@@ -2186,7 +2186,7 @@ async function sendInvoiceEmail(order) {
 
     `;
 
-    const response = await fetch(
+    const response = await fetch((
       "https://api.brevo.com/v3/smtp/email",
       {
         method: "POST",
@@ -2219,7 +2219,7 @@ async function sendInvoiceEmail(order) {
         })
 
       }
-    );
+    ))
   
 
     const data =
@@ -3584,7 +3584,7 @@ try {
   };
 
   const response =
-    await fetch(
+    await fetch((
       "https://api.brevo.com/v3/smtp/email",
       {
         method: "POST",
@@ -3595,7 +3595,7 @@ try {
         },
         body: JSON.stringify(resetEmail)
       }
-    );
+    ))
 
   const data = await response.json();
 
