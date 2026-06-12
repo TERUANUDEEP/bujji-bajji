@@ -4,12 +4,22 @@ const ADMINS = [
   "teruanudeep987@gmail.com",
   "sanju01800@gmail.com"
 ];
-const nodemailer = require("nodemailer");
+
 const brevo = require("@getbrevo/brevo");
+console.log("transactionalEmails:");
+console.log(brevo.Brevo.transactionalEmails);
 
-console.log("BREVO OBJECT:");
-console.log(brevo);
 
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS
+  }
+});
 const puppeteer = require("puppeteer");
 const QRCode = require("qrcode");
 const path = require("path");
@@ -185,10 +195,7 @@ const Feedback = mongoose.model("Feedback", FeedbackSchema);
 console.log("BREVO_USER =", process.env.BREVO_USER);
 console.log("BREVO_PASS exists =", !!process.env.BREVO_PASS);
 
-// apiInstance.setApiKey(
-//   brevo.TransactionalEmailsApiApiKeys.apiKey,
-//   process.env.BREVO_API_KEY
-// );
+
 let otpStore = {};
 
 /* =========================
@@ -3563,12 +3570,10 @@ app.post("/send-delivery-otp", async (req, res) => {
     const order = await Order.findById(orderId);
 
     if (!order) {
-
       return res.status(404).json({
         success: false,
         message: "Order not found"
       });
-
     }
 
     const otp = Math.floor(
@@ -3580,34 +3585,22 @@ app.post("/send-delivery-otp", async (req, res) => {
 
     await order.save();
 
-    const email = new brevo.SendSmtpEmail();
+    await transporter.sendMail({
 
-    email.subject =
-      "BUJJI BAJJI Delivery OTP";
+      from: "teruanudeep987@gmail.com",
 
-    email.htmlContent = `
-      <h2>Your Delivery OTP</h2>
-      <h1>${otp}</h1>
-      <p>
-        Share this OTP only after
-        receiving your order.
-      </p>
-    `;
+      to: order.user,
 
-    email.sender = {
-      name: "BUJJI BAJJI",
-      email: "teruanudeep987@gmail.com"
-    };
+      subject: "BUJJI BAJJI Delivery OTP",
 
-    email.to = [
-      {
-        email: order.user
-      }
-    ];
-
-    // await apiInstance.sendTransacEmail(
-    //   email
-    // );
+      html: `
+        <h2>Your Delivery OTP</h2>
+        <h1>${otp}</h1>
+        <p>
+          Share this OTP only after receiving your order.
+        </p>
+      `
+    });
 
     console.log("EMAIL SENT");
 
@@ -3643,70 +3636,7 @@ app.post("/verify-email-otp", (req, res) => {
   }
 });
 
-app.post("/send-delivery-otp", async (req, res) => {
 
-  console.log("SEND OTP HIT");
-
-  try {
-
-    const { orderId } = req.body;
-
-    console.log("ORDER ID:", orderId);
-
-    const order = await Order.findById(orderId);
-
-    console.log("ORDER FOUND:", !!order);
-
-    if (!order) {
-      return res.status(404).json({
-        success:false,
-        message:"Order not found"
-      });
-    }
-
-    console.log("EMAIL:", order.user);
-
-    const otp =
-      Math.floor(
-        100000 + Math.random() * 900000
-      ).toString();
-
-    console.log("OTP GENERATED");
-
-    order.deliveryOtp = otp;
-
-    await order.save();
-
-    console.log("ORDER SAVED");
-
-    console.log("ABOUT TO SEND EMAIL");
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: order.user,
-      subject: "BUJJI BAJJI Delivery OTP",
-      text: `Your OTP is ${otp}`
-    });
-
-    console.log("EMAIL SENT");
-
-    res.json({
-      success:true,
-      message:"Delivery OTP sent"
-    });
-
-  } catch(err) {
-
-    console.log("OTP ERROR:");
-    console.log(err);
-
-    res.status(500).json({
-      success:false
-    });
-
-  }
-
-});
 
 app.post("/verify-delivery-otp", async (req, res) => {
 
