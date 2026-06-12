@@ -2220,6 +2220,7 @@ async function sendInvoiceEmail(order) {
 
       }
     );
+  
 
     const data =
       await response.json();
@@ -2230,6 +2231,7 @@ async function sendInvoiceEmail(order) {
     );
 
   }
+
 
   catch (err) {
 
@@ -2316,9 +2318,9 @@ await autoAssignOrders();
 
     try {
 
-      // await sendInvoiceEmail(
-      //   newOrder
-      // );
+      await sendInvoiceEmail(
+        newOrder
+      );
 
       console.log(
         "✅ Invoice email sent"
