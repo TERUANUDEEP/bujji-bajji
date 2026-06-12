@@ -185,10 +185,10 @@ const Feedback = mongoose.model("Feedback", FeedbackSchema);
 console.log("BREVO_USER =", process.env.BREVO_USER);
 console.log("BREVO_PASS exists =", !!process.env.BREVO_PASS);
 
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+// apiInstance.setApiKey(
+//   brevo.TransactionalEmailsApiApiKeys.apiKey,
+//   process.env.BREVO_API_KEY
+// );
 let otpStore = {};
 
 /* =========================
@@ -3605,9 +3605,9 @@ app.post("/send-delivery-otp", async (req, res) => {
       }
     ];
 
-    await apiInstance.sendTransacEmail(
-      email
-    );
+    // await apiInstance.sendTransacEmail(
+    //   email
+    // );
 
     console.log("EMAIL SENT");
 
