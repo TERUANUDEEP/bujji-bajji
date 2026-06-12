@@ -10,16 +10,8 @@ console.log("transactionalEmails:");
 console.log(brevo.Brevo.transactionalEmails);
 
 
-const nodemailer = require("nodemailer");
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 2525,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS
-  }
-});
+
+
 const puppeteer = require("puppeteer");
 const QRCode = require("qrcode");
 const path = require("path");
@@ -2056,370 +2048,370 @@ app.post("/remove-favorite", async (req, res) => {
 
 });
 
-async function sendInvoiceEmail(order){
-
-  return new Promise(async (resolve,reject)=>{
-
-    try{
-
-      const fs = require("fs");
-const path = require("path");
-
-     const browser = await puppeteer.launch({
-  headless: "new",
-  args: [
-    "--no-sandbox",
-    "--disable-setuid-sandbox"
-  ]
-});
-
-const page = await browser.newPage();
-
-  order.items = order.items.map(item => {
-
-  let imageUrl = "";
-
-  if (
-    item.img &&
-    item.img.startsWith("http")
-  ) {
-
-    imageUrl = item.img;
-
-  } else if (item.img) {
-
-    const imagePath = path.join(
-      __dirname,
-      "..",
-      item.img
-    );
-
-    if (fs.existsSync(imagePath)) {
-
-      const imageBuffer =
-        fs.readFileSync(imagePath);
-
-      imageUrl =
-        `data:image/jpeg;base64,${
-          imageBuffer.toString("base64")
-        }`;
-
-    }
-
-  }
-
-  return {
-    ...item,
-    imageUrl
-  };
-
-});
-const verifyQR = await QRCode.toDataURL(
-JSON.stringify({
-  orderId: order._id,
-  customer: order.user,
-  phone: order.phone,
-  total: order.total,
-  status: order.status
-})
-);
-const trackingQR =
-  await QRCode.toDataURL(
-    `${WEBSITE_URL}/tracking.html?id=${order._id}`
-  );
-
-
-const invoiceId =
-`INV-${order._id.toString().slice(-6).toUpperCase()}`;
-
-const invoiceHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-
-<style>
-
-body{
-font-family:Arial,sans-serif;
-padding:30px;
-background:#f8f8f8;
-}
-
-.invoice{
-background:white;
-border-radius:20px;
-padding:30px;
-box-shadow:0 0 15px rgba(0,0,0,.1);
-}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:3px solid #b91c1c;
-padding-bottom:20px;
-}
-
-.logo{
-font-size:42px;
-font-weight:bold;
-color:#b91c1c;
-}
-
-.tagline{
-color:#15803d;
-font-size:18px;
-}
-
-.badge{
-background:#b91c1c;
-color:white;
-padding:10px 20px;
-border-radius:12px;
-font-weight:bold;
-}
-
-.section{
-margin-top:25px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:15px;
-}
-
-th{
-background:#b91c1c;
-color:white;
-padding:12px;
-}
-
-td{
-padding:12px;
-border:1px solid #ddd;
-text-align:center;
-}
-
-.food-img{
-width:70px;
-height:70px;
-object-fit:cover;
-border-radius:10px;
-}
-
-.total{
-font-size:28px;
-font-weight:bold;
-color:#b91c1c;
-text-align:right;
-margin-top:20px;
-}
-
-.footer{
-margin-top:40px;
-padding:20px;
-background:#b91c1c;
-color:white;
-text-align:center;
-border-radius:15px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="invoice">
-
-<div class="header" style="
-background:linear-gradient(135deg,#b91c1c,#ef4444);
-padding:25px;
-border-radius:20px;
-color:white;
-margin-bottom:25px;
-">
-
-<div>
-<h1 style="
-margin:0;
-font-size:42px;
-">
-🍽️ BUJJI BAJJI
-</h1>
-
-<p style="
-margin-top:8px;
-font-size:16px;
-">
-Crispy Outside. Happy Inside.
-</p>
-</div>
-
-<div style="
-text-align:right;
-">
-<h2 style="
-margin:0;
-">
-INVOICE
-</h2>
-
-<p>
-#${order._id}
-</p>
-</div>
-
-</div>
-
-<div class="section">
-
-<h2>Customer Details</h2>
-
-<p><b>Email:</b> ${order.user}</p>
-
-<p><b>Phone:</b> ${order.phone}</p>
-
-<p><b>Address:</b> ${order.address}</p>
-
-<p><b>Payment:</b> ${order.payment}</p>
-
-<p><b>Status:</b> ${order.status}</p>
-
-<p><b>Order Time:</b> ${order.time}</p>
-
-</div>
-
-<div class="section">
-
-<h2>Items Ordered</h2>
-
-<table>
-
-<tr>
-<th>Image</th>
-<th>Item</th>
-<th>Price</th>
-<th>Qty</th>
-<th>Total</th>
-</tr>
-
-${order.items.map(item => `
-<tr>
-
-<td>
-<img
-  src="${item.imageUrl}"
-  width="50"
-  height="50"
-  class="food-img"
-/>
-</td>
+// async function sendInvoiceEmail(order){
+
+//   return new Promise(async (resolve,reject)=>{
+
+//     try{
+
+//       const fs = require("fs");
+// const path = require("path");
+
+//      const browser = await puppeteer.launch({
+//   headless: "new",
+//   args: [
+//     "--no-sandbox",
+//     "--disable-setuid-sandbox"
+//   ]
+// });
+
+// const page = await browser.newPage();
+
+//   order.items = order.items.map(item => {
+
+//   let imageUrl = "";
+
+//   if (
+//     item.img &&
+//     item.img.startsWith("http")
+//   ) {
+
+//     imageUrl = item.img;
+
+//   } else if (item.img) {
+
+//     const imagePath = path.join(
+//       __dirname,
+//       "..",
+//       item.img
+//     );
+
+//     if (fs.existsSync(imagePath)) {
+
+//       const imageBuffer =
+//         fs.readFileSync(imagePath);
+
+//       imageUrl =
+//         `data:image/jpeg;base64,${
+//           imageBuffer.toString("base64")
+//         }`;
+
+//     }
+
+//   }
+
+//   return {
+//     ...item,
+//     imageUrl
+//   };
+
+// });
+// const verifyQR = await QRCode.toDataURL(
+// JSON.stringify({
+//   orderId: order._id,
+//   customer: order.user,
+//   phone: order.phone,
+//   total: order.total,
+//   status: order.status
+// })
+// );
+// const trackingQR =
+//   await QRCode.toDataURL(
+//     `${WEBSITE_URL}/tracking.html?id=${order._id}`
+//   );
+
+
+// const invoiceId =
+// `INV-${order._id.toString().slice(-6).toUpperCase()}`;
+
+// const invoiceHtml = `
+// <!DOCTYPE html>
+// <html>
+// <head>
+// <meta charset="UTF-8">
+
+// <style>
+
+// body{
+// font-family:Arial,sans-serif;
+// padding:30px;
+// background:#f8f8f8;
+// }
+
+// .invoice{
+// background:white;
+// border-radius:20px;
+// padding:30px;
+// box-shadow:0 0 15px rgba(0,0,0,.1);
+// }
+
+// .header{
+// display:flex;
+// justify-content:space-between;
+// align-items:center;
+// border-bottom:3px solid #b91c1c;
+// padding-bottom:20px;
+// }
+
+// .logo{
+// font-size:42px;
+// font-weight:bold;
+// color:#b91c1c;
+// }
+
+// .tagline{
+// color:#15803d;
+// font-size:18px;
+// }
+
+// .badge{
+// background:#b91c1c;
+// color:white;
+// padding:10px 20px;
+// border-radius:12px;
+// font-weight:bold;
+// }
+
+// .section{
+// margin-top:25px;
+// }
+
+// table{
+// width:100%;
+// border-collapse:collapse;
+// margin-top:15px;
+// }
+
+// th{
+// background:#b91c1c;
+// color:white;
+// padding:12px;
+// }
+
+// td{
+// padding:12px;
+// border:1px solid #ddd;
+// text-align:center;
+// }
+
+// .food-img{
+// width:70px;
+// height:70px;
+// object-fit:cover;
+// border-radius:10px;
+// }
+
+// .total{
+// font-size:28px;
+// font-weight:bold;
+// color:#b91c1c;
+// text-align:right;
+// margin-top:20px;
+// }
+
+// .footer{
+// margin-top:40px;
+// padding:20px;
+// background:#b91c1c;
+// color:white;
+// text-align:center;
+// border-radius:15px;
+// }
+
+// </style>
+// </head>
+
+// <body>
+
+// <div class="invoice">
+
+// <div class="header" style="
+// background:linear-gradient(135deg,#b91c1c,#ef4444);
+// padding:25px;
+// border-radius:20px;
+// color:white;
+// margin-bottom:25px;
+// ">
+
+// <div>
+// <h1 style="
+// margin:0;
+// font-size:42px;
+// ">
+// 🍽️ BUJJI BAJJI
+// </h1>
+
+// <p style="
+// margin-top:8px;
+// font-size:16px;
+// ">
+// Crispy Outside. Happy Inside.
+// </p>
+// </div>
+
+// <div style="
+// text-align:right;
+// ">
+// <h2 style="
+// margin:0;
+// ">
+// INVOICE
+// </h2>
+
+// <p>
+// #${order._id}
+// </p>
+// </div>
+
+// </div>
+
+// <div class="section">
+
+// <h2>Customer Details</h2>
+
+// <p><b>Email:</b> ${order.user}</p>
+
+// <p><b>Phone:</b> ${order.phone}</p>
+
+// <p><b>Address:</b> ${order.address}</p>
+
+// <p><b>Payment:</b> ${order.payment}</p>
+
+// <p><b>Status:</b> ${order.status}</p>
+
+// <p><b>Order Time:</b> ${order.time}</p>
+
+// </div>
+
+// <div class="section">
+
+// <h2>Items Ordered</h2>
+
+// <table>
+
+// <tr>
+// <th>Image</th>
+// <th>Item</th>
+// <th>Price</th>
+// <th>Qty</th>
+// <th>Total</th>
+// </tr>
+
+// ${order.items.map(item => `
+// <tr>
+
+// <td>
+// <img
+//   src="${item.imageUrl}"
+//   width="50"
+//   height="50"
+//   class="food-img"
+// />
+// </td>
 
-<td>${item.name}</td>
+// <td>${item.name}</td>
 
-<td>₹${item.price}</td>
+// <td>₹${item.price}</td>
 
-<td>${item.qty}</td>
+// <td>${item.qty}</td>
 
-<td>₹${item.price * item.qty}</td>
+// <td>₹${item.price * item.qty}</td>
 
-</tr>
-`).join("")}
+// </tr>
+// `).join("")}
 
-</table>
+// </table>
 
-</div>
+// </div>
 
-<div class="total">
-Grand Total: ₹${order.total}
-</div>
-<div style="
-display:flex;
-justify-content:space-around;
-margin-top:30px;
-">
+// <div class="total">
+// Grand Total: ₹${order.total}
+// </div>
+// <div style="
+// display:flex;
+// justify-content:space-around;
+// margin-top:30px;
+// ">
 
-<div style="text-align:center;">
-<img src="${trackingQR}" width="140">
-<p>Track Order</p>
-</div>
+// <div style="text-align:center;">
+// <img src="${trackingQR}" width="140">
+// <p>Track Order</p>
+// </div>
 
-<div style="text-align:center;">
-<img src="${verifyQR}" width="140">
-<p>Verify Order</p>
-</div>
+// <div style="text-align:center;">
+// <img src="${verifyQR}" width="140">
+// <p>Verify Order</p>
+// </div>
 
-</div>
+// </div>
 
 
-<div class="footer">
+// <div class="footer">
 
-<h2>
-Thank you for choosing BUJJI BAJJI!
-</h2>
+// <h2>
+// Thank you for choosing BUJJI BAJJI!
+// </h2>
 
-<p>
-Your love keeps us frying 😊
-</p>
+// <p>
+// Your love keeps us frying 😊
+// </p>
 
-</div>
+// </div>
 
-</div>
+// </div>
 
-</body>
-</html>
-`;
+// </body>
+// </html>
+// `;
 
-await page.setContent(
-  invoiceHtml,
-  {
-    waitUntil: "networkidle2"
-  }
-);
-await page.waitForSelector("img");
-await page.waitForTimeout(5000);
-const pdfData = await page.pdf({
-  format: "A4",
-  printBackground: true
-});
+// await page.setContent(
+//   invoiceHtml,
+//   {
+//     waitUntil: "networkidle2"
+//   }
+// );
+// await page.waitForSelector("img");
+// await page.waitForTimeout(5000);
+// const pdfData = await page.pdf({
+//   format: "A4",
+//   printBackground: true
+// });
 
-await browser.close();
+// await browser.close();
 
-await transporter.sendMail({
+// await transporter.sendMail({
 
-  from: process.env.EMAIL_USER,
+//   from: process.env.EMAIL_USER,
 
-  to: order.user,
+//   to: order.user,
 
-  subject: "BUJJI BAJJI Invoice",
+//   subject: "BUJJI BAJJI Invoice",
 
-  text: `Thank you for ordering from BUJJI BAJJI.
+//   text: `Thank you for ordering from BUJJI BAJJI.
 
-Your invoice is attached.`,
+// Your invoice is attached.`,
 
-  attachments: [
-    {
-      filename: `Invoice-${order._id}.pdf`,
-      content: pdfData
-    }
-  ]
+//   attachments: [
+//     {
+//       filename: `Invoice-${order._id}.pdf`,
+//       content: pdfData
+//     }
+//   ]
 
-});
+// });
 
-resolve();
-    }
+// resolve();
+//     }
 
-    catch(err){
+//     catch(err){
 
-      reject(err);
+//       reject(err);
 
-    }
+//     }
 
-  });
+//   });
 
-}
+// }
 
 app.post("/order", async (req, res) => {
 
@@ -3269,273 +3261,273 @@ onTheWayOrders
 
 });
 
-app.post("/send-analytics-report", async (req, res) => {
+// app.post("/send-analytics-report", async (req, res) => {
 
-  try {
-const orders = await Order.find();
+//   try {
+// const orders = await Order.find();
 
-const totalOrders =
-  orders.length;
+// const totalOrders =
+//   orders.length;
 
-const revenue =
-  orders.reduce(
-    (sum, order) =>
-      sum + (order.total || 0),
-    0
-  );
+// const revenue =
+//   orders.reduce(
+//     (sum, order) =>
+//       sum + (order.total || 0),
+//     0
+//   );
 
-const deliveredOrders =
-  orders.filter(
-    order =>
-      order.status === "Delivered ✅"
-  ).length;
+// const deliveredOrders =
+//   orders.filter(
+//     order =>
+//       order.status === "Delivered ✅"
+//   ).length;
 
-const pendingOrders =
-  totalOrders - deliveredOrders;
+// const pendingOrders =
+//   totalOrders - deliveredOrders;
 
-  const deliveryRate =
-totalOrders > 0
-? (
-    (deliveredOrders / totalOrders)
-    * 100
-  ).toFixed(1)
-: 0;
+//   const deliveryRate =
+// totalOrders > 0
+// ? (
+//     (deliveredOrders / totalOrders)
+//     * 100
+//   ).toFixed(1)
+// : 0;
 
-const reportHtml = `
+// const reportHtml = `
 
-<!DOCTYPE html>
+// <!DOCTYPE html>
 
-<html>
+// <html>
 
-<head>
+// <head>
 
-<style>
+// <style>
 
-body{
-font-family:Arial;
-padding:30px;
-background:#f4f4f4;
-}
+// body{
+// font-family:Arial;
+// padding:30px;
+// background:#f4f4f4;
+// }
 
-.report{
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 0 15px rgba(0,0,0,.15);
-}
+// .report{
+// background:white;
+// padding:30px;
+// border-radius:20px;
+// box-shadow:0 0 15px rgba(0,0,0,.15);
+// }
 
-.header{
-background:#ea580c;
-color:white;
-padding:20px;
-border-radius:15px;
-text-align:center;
-}
+// .header{
+// background:#ea580c;
+// color:white;
+// padding:20px;
+// border-radius:15px;
+// text-align:center;
+// }
 
-.card{
-background:#fafafa;
-padding:15px;
-margin-top:15px;
-border-radius:12px;
-}
+// .card{
+// background:#fafafa;
+// padding:15px;
+// margin-top:15px;
+// border-radius:12px;
+// }
 
-.value{
-font-size:28px;
-font-weight:bold;
-color:#ea580c;
-}
+// .value{
+// font-size:28px;
+// font-weight:bold;
+// color:#ea580c;
+// }
 
-</style>
+// </style>
 
-</head>
+// </head>
 
-<body>
+// <body>
 
-<div class="report">
+// <div class="report">
 
-<div class="header">
+// <div class="header">
 
-<h1>
-📊 BUJJI BAJJI
-Analytics Report
-</h1>
+// <h1>
+// 📊 BUJJI BAJJI
+// Analytics Report
+// </h1>
 
-<p>
-${new Date().toLocaleString()}
-</p>
+// <p>
+// ${new Date().toLocaleString()}
+// </p>
 
-</div>
+// </div>
 
-<div class="card">
+// <div class="card">
 
-<h3>Total Orders</h3>
+// <h3>Total Orders</h3>
 
-<div class="value">
-${totalOrders}
-</div>
+// <div class="value">
+// ${totalOrders}
+// </div>
 
-</div>
+// </div>
 
-<div class="card">
+// <div class="card">
 
-<h3>Total Revenue</h3>
+// <h3>Total Revenue</h3>
 
-<div class="value">
-₹${revenue}
-</div>
+// <div class="value">
+// ₹${revenue}
+// </div>
 
-</div>
+// </div>
 
-<div class="card">
+// <div class="card">
 
-<h3>Delivered Orders</h3>
+// <h3>Delivered Orders</h3>
 
-<div class="value">
-${deliveredOrders}
-</div>
+// <div class="value">
+// ${deliveredOrders}
+// </div>
 
-</div>
+// </div>
 
-<div class="card">
+// <div class="card">
 
-<h3>Pending Orders</h3>
+// <h3>Pending Orders</h3>
 
-<div class="value">
-${pendingOrders}
-</div>
+// <div class="value">
+// ${pendingOrders}
+// </div>
 
-</div>
+// </div>
 
-<div class="card">
+// <div class="card">
 
-<h3>Delivery Success Rate</h3>
+// <h3>Delivery Success Rate</h3>
 
-<div class="value">
-${deliveryRate}%
-</div>
+// <div class="value">
+// ${deliveryRate}%
+// </div>
 
-</div>
+// </div>
 
-</div>
+// </div>
 
-</body>
+// </body>
 
-</html>
+// </html>
 
-`;
-const browser =
-await puppeteer.launch({
+// `;
+// const browser =
+// await puppeteer.launch({
 
-  headless: "new",
+//   headless: "new",
 
-  args: [
+//   args: [
 
-    "--no-sandbox",
+//     "--no-sandbox",
 
-    "--disable-setuid-sandbox"
+//     "--disable-setuid-sandbox"
 
-  ]
+//   ]
 
-});
+// });
 
-const page =
-await browser.newPage();
+// const page =
+// await browser.newPage();
 
-await page.setContent(
-  reportHtml,
-  {
-    waitUntil:
-    "networkidle2"
-  }
-);
+// await page.setContent(
+//   reportHtml,
+//   {
+//     waitUntil:
+//     "networkidle2"
+//   }
+// );
 
-await page.waitForTimeout(
-  1000
-);
+// await page.waitForTimeout(
+//   1000
+// );
 
-const pdfData =
-await page.pdf({
+// const pdfData =
+// await page.pdf({
 
-  format: "A4",
+//   format: "A4",
 
-  printBackground: true
+//   printBackground: true
 
-});
+// });
 
-await transporter.sendMail({
+// await transporter.sendMail({
 
-  from: process.env.EMAIL_USER,
+//   from: process.env.EMAIL_USER,
 
-  to: "teruanudeep987@gmail.com",
+//   to: "teruanudeep987@gmail.com",
 
-  subject:
-  "📊 Bujji Bajji Analytics Report",
+//   subject:
+//   "📊 Bujji Bajji Analytics Report",
 
-  html: `
-  <h2>
-  Analytics Report Generated
-  </h2>
+//   html: `
+//   <h2>
+//   Analytics Report Generated
+//   </h2>
 
-  <p>
-  Attached is the latest analytics report.
-  </p>
-  `,
+//   <p>
+//   Attached is the latest analytics report.
+//   </p>
+//   `,
 
-  attachments: [
+//   attachments: [
 
-    {
+//     {
 
-      filename:
-      "Bujji-Bajji-Analytics.pdf",
+//       filename:
+//       "Bujji-Bajji-Analytics.pdf",
 
-      content: pdfData
+//       content: pdfData
 
-    }
+//     }
 
-  ]
+//   ]
 
-});
+// });
 
-await browser.close();
-const fs = require("fs");
-const path = require("path");
+// await browser.close();
+// const fs = require("fs");
+// const path = require("path");
+
+// // res.json({
+
+// //   success: true,
+
+// //   totalOrders,
+
+// //   revenue,
+
+// //   deliveredOrders,
+
+// //   pendingOrders
+
+// // });
 
 // res.json({
 
 //   success: true,
 
-//   totalOrders,
-
-//   revenue,
-
-//   deliveredOrders,
-
-//   pendingOrders
+//   message:
+//   "Analytics report emailed successfully"
 
 // });
 
-res.json({
+//   }
 
-  success: true,
+//   catch (err) {
 
-  message:
-  "Analytics report emailed successfully"
+//     console.log(err);
 
-});
+//     res.status(500).json({
+//       success: false
+//     });
 
-  }
+//   }
 
-  catch (err) {
-
-    console.log(err);
-
-    res.status(500).json({
-      success: false
-    });
-
-  }
-
-});
+// });
 
 app.put("/order/:id", async (req, res) => {
   const { status, user } = req.body;
@@ -3585,24 +3577,40 @@ app.post("/send-delivery-otp", async (req, res) => {
 
     await order.save();
 
-    await transporter.sendMail({
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "BUJJI BAJJI",
+            email: "teruanudeep987@gmail.com"
+          },
+          to: [
+            {
+              email: order.user
+            }
+          ],
+          subject: "BUJJI BAJJI Delivery OTP",
+          htmlContent: `
+            <h2>Your Delivery OTP</h2>
+            <h1>${otp}</h1>
+            <p>
+              Share this OTP only after receiving your order.
+            </p>
+          `
+        })
+      }
+    );
 
-      from: "teruanudeep987@gmail.com",
+    const result = await response.text();
 
-      to: order.user,
-
-      subject: "BUJJI BAJJI Delivery OTP",
-
-      html: `
-        <h2>Your Delivery OTP</h2>
-        <h1>${otp}</h1>
-        <p>
-          Share this OTP only after receiving your order.
-        </p>
-      `
-    });
-
-    console.log("EMAIL SENT");
+    console.log("BREVO RESPONSE:", result);
 
     res.json({
       success: true,
@@ -3623,7 +3631,6 @@ app.post("/send-delivery-otp", async (req, res) => {
   }
 
 });
-
 app.post("/verify-email-otp", (req, res) => {
   const { email, otp } = req.body;
   const key = email.trim().toLowerCase();
@@ -3699,79 +3706,79 @@ await order.save();
 });
 
 // 🔑 RESET PASSWORD
-app.post("/reset-password", async (req, res) => {
+// app.post("/reset-password", async (req, res) => {
 
-  try {
+//   try {
 
-    let { email, newPassword } = req.body;
+//     let { email, newPassword } = req.body;
 
-    // 🔍 Find User
-    let user =
-      await User.findOne({ email });
+//     // 🔍 Find User
+//     let user =
+//       await User.findOne({ email });
 
-    if (!user) {
+//     if (!user) {
 
-      return res.status(404).json({
-        message: "User not found"
-      });
+//       return res.status(404).json({
+//         message: "User not found"
+//       });
 
-    }
+//     }
 
-    // 🔐 Hash New Password
-    let hashedPassword =
-      await bcrypt.hash(newPassword, 10);
+//     // 🔐 Hash New Password
+//     let hashedPassword =
+//       await bcrypt.hash(newPassword, 10);
 
-    // 💾 Save Password
-    user.password =
-      hashedPassword;
+//     // 💾 Save Password
+//     user.password =
+//       hashedPassword;
 
-    await user.save();
+//     await user.save();
 
-    // ✉️ Send notification email
-    try {
-      await transporter.sendMail({
-        from: 'Bajji Culture <teruanudeep987@gmail.com>',
-        to: email,
-        subject: 'Your Bajji Culture password has been changed',
-        text: `Hello,
+//     // ✉️ Send notification email
+//     try {
+//       await transporter.sendMail({
+//         from: 'Bajji Culture <teruanudeep987@gmail.com>',
+//         to: email,
+//         subject: 'Your Bajji Culture password has been changed',
+//         text: `Hello,
 
-Your Bajji Culture password was successfully changed.
+// Your Bajji Culture password was successfully changed.
 
-If you did not request this change, please contact support immediately.
+// If you did not request this change, please contact support immediately.
 
-Thank you,
-Bajji Culture Team`,
-      });
-    } catch (mailErr) {
-      console.log('Password reset email failed:', mailErr);
-    }
+// Thank you,
+// Bajji Culture Team`,
+//       });
+//     } catch (mailErr) {
+//       console.log('Password reset email failed:', mailErr);
+//     }
 
-    res.json({
+//     res.json({
 
-      success: true,
+//       success: true,
 
-      message:
-        "Password updated successfully ✅"
+//       message:
+//         "Password updated successfully ✅"
 
-    });
+//     });
 
-  }
+//   }
 
-  catch (err) {
+//   catch (err) {
 
-    console.log(err);
+//     console.log(err);
 
-    res.status(500).json({
+//     res.status(500).json({
 
-      success: false,
+//       success: false,
 
-      message: "Server error"
+//       message: "Server error"
 
-    });
+//     });
 
-  }
+//   }
 
-});
+// });
 
 
 app.get("/users", async (req, res) => {
