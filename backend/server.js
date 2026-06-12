@@ -2048,370 +2048,199 @@ app.post("/remove-favorite", async (req, res) => {
 
 });
 
-// async function sendInvoiceEmail(order){
-
-//   return new Promise(async (resolve,reject)=>{
-
-//     try{
-
-//       const fs = require("fs");
-// const path = require("path");
-
-//      const browser = await puppeteer.launch({
-//   headless: "new",
-//   args: [
-//     "--no-sandbox",
-//     "--disable-setuid-sandbox"
-//   ]
-// });
-
-// const page = await browser.newPage();
-
-//   order.items = order.items.map(item => {
-
-//   let imageUrl = "";
-
-//   if (
-//     item.img &&
-//     item.img.startsWith("http")
-//   ) {
-
-//     imageUrl = item.img;
-
-//   } else if (item.img) {
-
-//     const imagePath = path.join(
-//       __dirname,
-//       "..",
-//       item.img
-//     );
-
-//     if (fs.existsSync(imagePath)) {
-
-//       const imageBuffer =
-//         fs.readFileSync(imagePath);
-
-//       imageUrl =
-//         `data:image/jpeg;base64,${
-//           imageBuffer.toString("base64")
-//         }`;
-
-//     }
-
-//   }
-
-//   return {
-//     ...item,
-//     imageUrl
-//   };
-
-// });
-// const verifyQR = await QRCode.toDataURL(
-// JSON.stringify({
-//   orderId: order._id,
-//   customer: order.user,
-//   phone: order.phone,
-//   total: order.total,
-//   status: order.status
-// })
-// );
-// const trackingQR =
-//   await QRCode.toDataURL(
-//     `${WEBSITE_URL}/tracking.html?id=${order._id}`
-//   );
-
-
-// const invoiceId =
-// `INV-${order._id.toString().slice(-6).toUpperCase()}`;
-
-// const invoiceHtml = `
-// <!DOCTYPE html>
-// <html>
-// <head>
-// <meta charset="UTF-8">
-
-// <style>
-
-// body{
-// font-family:Arial,sans-serif;
-// padding:30px;
-// background:#f8f8f8;
-// }
-
-// .invoice{
-// background:white;
-// border-radius:20px;
-// padding:30px;
-// box-shadow:0 0 15px rgba(0,0,0,.1);
-// }
-
-// .header{
-// display:flex;
-// justify-content:space-between;
-// align-items:center;
-// border-bottom:3px solid #b91c1c;
-// padding-bottom:20px;
-// }
-
-// .logo{
-// font-size:42px;
-// font-weight:bold;
-// color:#b91c1c;
-// }
-
-// .tagline{
-// color:#15803d;
-// font-size:18px;
-// }
-
-// .badge{
-// background:#b91c1c;
-// color:white;
-// padding:10px 20px;
-// border-radius:12px;
-// font-weight:bold;
-// }
-
-// .section{
-// margin-top:25px;
-// }
-
-// table{
-// width:100%;
-// border-collapse:collapse;
-// margin-top:15px;
-// }
-
-// th{
-// background:#b91c1c;
-// color:white;
-// padding:12px;
-// }
-
-// td{
-// padding:12px;
-// border:1px solid #ddd;
-// text-align:center;
-// }
-
-// .food-img{
-// width:70px;
-// height:70px;
-// object-fit:cover;
-// border-radius:10px;
-// }
-
-// .total{
-// font-size:28px;
-// font-weight:bold;
-// color:#b91c1c;
-// text-align:right;
-// margin-top:20px;
-// }
-
-// .footer{
-// margin-top:40px;
-// padding:20px;
-// background:#b91c1c;
-// color:white;
-// text-align:center;
-// border-radius:15px;
-// }
-
-// </style>
-// </head>
-
-// <body>
-
-// <div class="invoice">
-
-// <div class="header" style="
-// background:linear-gradient(135deg,#b91c1c,#ef4444);
-// padding:25px;
-// border-radius:20px;
-// color:white;
-// margin-bottom:25px;
-// ">
-
-// <div>
-// <h1 style="
-// margin:0;
-// font-size:42px;
-// ">
-// 🍽️ BUJJI BAJJI
-// </h1>
-
-// <p style="
-// margin-top:8px;
-// font-size:16px;
-// ">
-// Crispy Outside. Happy Inside.
-// </p>
-// </div>
-
-// <div style="
-// text-align:right;
-// ">
-// <h2 style="
-// margin:0;
-// ">
-// INVOICE
-// </h2>
-
-// <p>
-// #${order._id}
-// </p>
-// </div>
-
-// </div>
-
-// <div class="section">
-
-// <h2>Customer Details</h2>
-
-// <p><b>Email:</b> ${order.user}</p>
-
-// <p><b>Phone:</b> ${order.phone}</p>
-
-// <p><b>Address:</b> ${order.address}</p>
-
-// <p><b>Payment:</b> ${order.payment}</p>
-
-// <p><b>Status:</b> ${order.status}</p>
-
-// <p><b>Order Time:</b> ${order.time}</p>
-
-// </div>
-
-// <div class="section">
-
-// <h2>Items Ordered</h2>
-
-// <table>
-
-// <tr>
-// <th>Image</th>
-// <th>Item</th>
-// <th>Price</th>
-// <th>Qty</th>
-// <th>Total</th>
-// </tr>
-
-// ${order.items.map(item => `
-// <tr>
-
-// <td>
-// <img
-//   src="${item.imageUrl}"
-//   width="50"
-//   height="50"
-//   class="food-img"
-// />
-// </td>
+async function sendInvoiceEmail(order) {
+
+  try {
+
+    const verifyQR = await QRCode.toDataURL(
+      JSON.stringify({
+        orderId: order._id,
+        customer: order.user,
+        phone: order.phone,
+        total: order.total,
+        status: order.status
+      })
+    );
+
+    const trackingQR =
+      await QRCode.toDataURL(
+        `${WEBSITE_URL}/tracking.html?id=${order._id}`
+      );
+
+    const invoiceHtml = `
+
+    <div style="
+      font-family:Arial,sans-serif;
+      max-width:800px;
+      margin:auto;
+      background:white;
+      border-radius:20px;
+      overflow:hidden;
+      border:1px solid #eee;
+    ">
+
+      <div style="
+        background:linear-gradient(135deg,#b91c1c,#ef4444);
+        color:white;
+        padding:25px;
+      ">
+
+        <h1 style="margin:0;">
+          🍽️ BUJJI BAJJI
+        </h1>
+
+        <p style="margin-top:8px;">
+          Crispy Outside. Happy Inside.
+        </p>
+
+      </div>
+
+      <div style="padding:25px;">
+
+        <h2>
+          Invoice #${order._id}
+        </h2>
+
+        <p><b>Email:</b> ${order.user}</p>
+
+        <p><b>Phone:</b> ${order.phone}</p>
+
+        <p><b>Address:</b> ${order.address}</p>
+
+        <p><b>Payment:</b> ${order.payment}</p>
+
+        <p><b>Status:</b> ${order.status}</p>
+
+        <p><b>Order Time:</b> ${order.time}</p>
+
+        <hr>
+
+        <h2>Items Ordered</h2>
+
+        <table
+          width="100%"
+          cellpadding="10"
+          cellspacing="0"
+          border="1"
+          style="border-collapse:collapse;"
+        >
+
+          <tr style="
+            background:#b91c1c;
+            color:white;
+          ">
+            <th>Item</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Total</th>
+          </tr>
+
+          ${order.items.map(item => `
+            <tr>
+              <td>${item.name}</td>
+              <td>₹${item.price}</td>
+              <td>${item.qty}</td>
+              <td>₹${item.price * item.qty}</td>
+            </tr>
+          `).join("")}
+
+        </table>
+
+        <h1 style="
+          color:#b91c1c;
+          text-align:right;
+        ">
+          ₹${order.total}
+        </h1>
 
-// <td>${item.name}</td>
+        <div style="
+          display:flex;
+          justify-content:space-around;
+          margin-top:30px;
+        ">
 
-// <td>₹${item.price}</td>
+          <div>
+            <img src="${trackingQR}" width="120">
+            <p>Track Order</p>
+          </div>
 
-// <td>${item.qty}</td>
+          <div>
+            <img src="${verifyQR}" width="120">
+            <p>Verify Order</p>
+          </div>
 
-// <td>₹${item.price * item.qty}</td>
+        </div>
 
-// </tr>
-// `).join("")}
+      </div>
 
-// </table>
+      <div style="
+        background:#b91c1c;
+        color:white;
+        text-align:center;
+        padding:20px;
+      ">
+        ❤️ Thank you for choosing BUJJI BAJJI
+      </div>
 
-// </div>
+    </div>
 
-// <div class="total">
-// Grand Total: ₹${order.total}
-// </div>
-// <div style="
-// display:flex;
-// justify-content:space-around;
-// margin-top:30px;
-// ">
+    `;
 
-// <div style="text-align:center;">
-// <img src="${trackingQR}" width="140">
-// <p>Track Order</p>
-// </div>
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
 
-// <div style="text-align:center;">
-// <img src="${verifyQR}" width="140">
-// <p>Verify Order</p>
-// </div>
+        headers: {
+          "accept": "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json"
+        },
 
-// </div>
+        body: JSON.stringify({
 
+          sender: {
+            name: "BUJJI BAJJI",
+            email: "teruanudeep987@gmail.com"
+          },
 
-// <div class="footer">
+          to: [
+            {
+              email: order.user
+            }
+          ],
 
-// <h2>
-// Thank you for choosing BUJJI BAJJI!
-// </h2>
+          subject:
+            `BUJJI BAJJI Invoice #${order._id}`,
 
-// <p>
-// Your love keeps us frying 😊
-// </p>
+          htmlContent:
+            invoiceHtml
 
-// </div>
+        })
 
-// </div>
+      }
+    );
 
-// </body>
-// </html>
-// `;
+    const data =
+      await response.json();
 
-// await page.setContent(
-//   invoiceHtml,
-//   {
-//     waitUntil: "networkidle2"
-//   }
-// );
-// await page.waitForSelector("img");
-// await page.waitForTimeout(5000);
-// const pdfData = await page.pdf({
-//   format: "A4",
-//   printBackground: true
-// });
+    console.log(
+      "INVOICE EMAIL:",
+      data
+    );
 
-// await browser.close();
+  }
 
-// await transporter.sendMail({
+  catch (err) {
 
-//   from: process.env.EMAIL_USER,
+    console.log(
+      "Invoice Email Error:",
+      err
+    );
 
-//   to: order.user,
+  }
 
-//   subject: "BUJJI BAJJI Invoice",
-
-//   text: `Thank you for ordering from BUJJI BAJJI.
-
-// Your invoice is attached.`,
-
-//   attachments: [
-//     {
-//       filename: `Invoice-${order._id}.pdf`,
-//       content: pdfData
-//     }
-//   ]
-
-// });
-
-// resolve();
-//     }
-
-//     catch(err){
-
-//       reject(err);
-
-//     }
-
-//   });
-
-// }
+}
 
 app.post("/order", async (req, res) => {
 
@@ -2487,9 +2316,9 @@ await autoAssignOrders();
 
     try {
 
-      await sendInvoiceEmail(
-        newOrder
-      );
+      // await sendInvoiceEmail(
+      //   newOrder
+      // );
 
       console.log(
         "✅ Invoice email sent"
@@ -3706,79 +3535,83 @@ await order.save();
 });
 
 // 🔑 RESET PASSWORD
-// app.post("/reset-password", async (req, res) => {
+//// ✉️ Send notification email using Brevo
 
-//   try {
+try {
 
-//     let { email, newPassword } = req.body;
+  const resetEmail = {
 
-//     // 🔍 Find User
-//     let user =
-//       await User.findOne({ email });
+    sender: {
+      name: "BUJJI BAJJI",
+      email: "teruanudeep987@gmail.com"
+    },
 
-//     if (!user) {
+    to: [
+      {
+        email: email
+      }
+    ],
 
-//       return res.status(404).json({
-//         message: "User not found"
-//       });
+    subject:
+      "Your BUJJI BAJJI password has been changed",
 
-//     }
+    htmlContent: `
+      <h2>Password Changed Successfully ✅</h2>
 
-//     // 🔐 Hash New Password
-//     let hashedPassword =
-//       await bcrypt.hash(newPassword, 10);
+      <p>
+        Hello,
+      </p>
 
-//     // 💾 Save Password
-//     user.password =
-//       hashedPassword;
+      <p>
+        Your BUJJI BAJJI password was successfully changed.
+      </p>
 
-//     await user.save();
+      <p>
+        If you did not request this change,
+        please contact support immediately.
+      </p>
 
-//     // ✉️ Send notification email
-//     try {
-//       await transporter.sendMail({
-//         from: 'Bajji Culture <teruanudeep987@gmail.com>',
-//         to: email,
-//         subject: 'Your Bajji Culture password has been changed',
-//         text: `Hello,
+      <br>
 
-// Your Bajji Culture password was successfully changed.
+      <p>
+        Thank you,
+        <br>
+        BUJJI BAJJI Team
+      </p>
+    `
+  };
 
-// If you did not request this change, please contact support immediately.
+  const response =
+    await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify(resetEmail)
+      }
+    );
 
-// Thank you,
-// Bajji Culture Team`,
-//       });
-//     } catch (mailErr) {
-//       console.log('Password reset email failed:', mailErr);
-//     }
+  const data = await response.json();
 
-//     res.json({
+  console.log(
+    "PASSWORD RESET EMAIL:",
+    data
+  );
 
-//       success: true,
+}
 
-//       message:
-//         "Password updated successfully ✅"
+catch (mailErr) {
 
-//     });
+  console.log(
+    "Password reset email failed:",
+    mailErr
+  );
 
-//   }
-
-//   catch (err) {
-
-//     console.log(err);
-
-//     res.status(500).json({
-
-//       success: false,
-
-//       message: "Server error"
-
-//     });
-
-//   }
-
-// });
+}
 
 
 app.get("/users", async (req, res) => {
