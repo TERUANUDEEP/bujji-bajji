@@ -2412,405 +2412,53 @@ app.get("/order/:id", async (req, res) => {
   }
 });
 
-// app.get("/invoice-pdf/:id", async (req, res) => {
-//   try {
+ app.get("/invoice-pdf/:id", async (req, res) => {
 
-//     const order = await Order.findById(req.params.id);
+  try {
 
-//     if (!order) {
-//       return res.status(404).send("Order not found");
-//     }
+    const order =
+      await Order.findById(
+        req.params.id
+      );
 
-//     const browser = await puppeteer.launch({
-//       headless: "new",
-//       args: ["--no-sandbox"]
-//     });
-
-//     const page = await browser.newPage();
-
-//     order.items = order.items.map(item => {
-
-//   let imageUrl = "";
-
-//   if (
-//     item.img &&
-//     item.img.startsWith("http")
-//   ) {
-
-//     imageUrl = item.img;
-
-//   } else if (item.img) {
-
-//     const imagePath = path.join(
-//       __dirname,
-//       "..",
-//       item.img
-//     );
-
-//     if (fs.existsSync(imagePath)) {
-
-//       const imageBuffer =
-//         fs.readFileSync(imagePath);
-
-//       imageUrl =
-//         `data:image/jpeg;base64,${
-//           imageBuffer.toString("base64")
-//         }`;
-
-//     }
-
-//   }
-
-//   return {
-//     ...item,
-//     imageUrl
-//   };
-
-// });
-
-//     const invoiceId =
-//       `INV-${order._id.toString().slice(-6).toUpperCase()}`;
-
-//     const trackingQR =
-//   await QRCode.toDataURL(
-//     `${WEBSITE_URL}/tracking.html?id=${order._id}`
-//   );
-//     const verifyQR =
-//       await QRCode.toDataURL(
-//         JSON.stringify({
-//           orderId: order._id,
-//           customer: order.user,
-//           total: order.total,
-//           phone: order.phone
-//         })
-//       );
-
-//     const invoiceHtml = `
-// <!DOCTYPE html>
-// <html>
-
-// <head>
-
-// <meta charset="UTF-8">
-
-// <style>
-
-// *{
-// box-sizing:border-box;
-// margin:0;
-// padding:0;
-// }
-
-// body{
-// font-family:Arial,sans-serif;
-// background:#f4f4f4;
-// padding:20px;
-// }
-
-// .invoice{
-// background:white;
-// border-radius:25px;
-// overflow:hidden;
-// box-shadow:0 0 25px rgba(0,0,0,.15);
-// }
-
-// .header{
-// background:linear-gradient(135deg,#b91c1c,#ef4444);
-// color:white;
-// padding:35px;
-// display:flex;
-// justify-content:space-between;
-// align-items:center;
-// }
-
-// .logo{
-// font-size:42px;
-// font-weight:bold;
-// }
-
-// .tagline{
-// font-size:15px;
-// margin-top:8px;
-// opacity:.95;
-// }
-
-// .invoice-id{
-// background:white;
-// color:#b91c1c;
-// padding:12px 20px;
-// border-radius:12px;
-// font-size:18px;
-// font-weight:bold;
-// }
-
-// .section{
-// padding:25px;
-// }
-
-// .customer-box{
-// background:#fafafa;
-// padding:20px;
-// border-radius:15px;
-// border-left:6px solid #b91c1c;
-// margin-bottom:25px;
-// }
-
-// .customer-box h2{
-// margin-bottom:12px;
-// color:#b91c1c;
-// }
-
-// .customer-box p{
-// margin:8px 0;
-// font-size:15px;
-// }
-
-// .order-table{
-// width:100%;
-// border-collapse:collapse;
-// margin-top:15px;
-// }
-
-// .order-table th{
-// background:#b91c1c;
-// color:white;
-// padding:12px;
-// }
-
-// .order-table td{
-// padding:12px;
-// border:1px solid #ddd;
-// text-align:center;
-// }
-
-// .food-img{
-// width:70px;
-// height:70px;
-// border-radius:10px;
-// object-fit:cover;
-// }
-
-// .total-box{
-// margin-top:25px;
-// background:#fff5f5;
-// padding:18px;
-// border-radius:15px;
-// text-align:right;
-// font-size:28px;
-// font-weight:bold;
-// color:#b91c1c;
-// }
-
-// .qr-section{
-// display:flex;
-// justify-content:space-around;
-// gap:20px;
-// margin-top:30px;
-// }
-
-// .qr-card{
-// flex:1;
-// background:#fafafa;
-// padding:20px;
-// border-radius:15px;
-// text-align:center;
-// border:1px solid #eee;
-// }
-
-// .qr-card img{
-// margin-bottom:10px;
-// }
-
-// .qr-card h3{
-// color:#b91c1c;
-// margin-bottom:8px;
-// }
-
-// .footer{
-// background:#b91c1c;
-// color:white;
-// text-align:center;
-// padding:30px;
-// margin-top:20px;
-// }
-
-// .footer h2{
-// margin-bottom:10px;
-// }
+    if (!order) {
 
-// </style>
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
 
-// </head>
+    }
 
-// <body>
+    await sendInvoiceEmail(order);
 
-// <div class="invoice">
+    res.json({
 
-// <div class="header">
+      success: true,
 
-// <div>
+      message:
+      "Invoice sent to your email successfully"
 
-// <div class="logo">
-// 🍽️ BUJJI BAJJI
-// </div>
+    });
 
-// <div class="tagline">
-// Crispy Outside. Happy Inside.
-// </div>
+  }
 
-// </div>
+  catch (err) {
 
-// <div class="invoice-id">
-// ${invoiceId}
-// </div>
+    console.log(err);
 
-// </div>
+    res.status(500).json({
 
-// <div class="section">
+      success: false,
 
-// <div class="customer-box">
+      message:
+      "Failed to send invoice"
 
-// <h2>Customer Details</h2>
+    });
 
-// <p><b>Email:</b> ${order.user}</p>
+  }
 
-// <p><b>Phone:</b> ${order.phone}</p>
-
-// <p><b>Address:</b> ${order.address}</p>
-
-// <p><b>Payment Method:</b> ${order.payment}</p>
-
-// <p><b>Order Status:</b> ${order.status}</p>
-
-// <p><b>Order Time:</b> ${order.time}</p>
-
-// </div>
-
-// <h2 style="color:#b91c1c;">
-// Items Ordered
-// </h2>
-
-// <table class="order-table">
-
-// <tr>
-// <th>Image</th>
-// <th>Item</th>
-// <th>Price</th>
-// <th>Qty</th>
-// <th>Total</th>
-// </tr>
-
-// ${order.items.map(item => `
-// <tr>
-
-// <td>
-// <img
-// src="${item.imageUrl}"
-// class="food-img">
-// </td>
-
-// <td>${item.name}</td>
-
-// <td>₹${item.price}</td>
-
-// <td>${item.qty}</td>
-
-// <td>₹${item.price * item.qty}</td>
-
-// </tr>
-// `).join("")}
-
-// </table>
-
-// <div class="total-box">
-// Grand Total : ₹${order.total}
-// </div>
-
-// <div class="qr-section">
-
-// <div class="qr-card">
-
-// <img
-// src="${trackingQR}"
-// width="140">
-
-// <h3>Track Order</h3>
-
-// <p>
-// Scan this QR to track your order live.
-// </p>
-
-// </div>
-
-// <div class="qr-card">
-
-// <img
-// src="${verifyQR}"
-// width="140">
-
-// <h3>Verify Order</h3>
-
-// <p>
-// Delivery agent can verify this order.
-// </p>
-
-// </div>
-
-// </div>
-
-// </div>
-
-// <div class="footer">
-
-// <h2>
-// ❤️ Thank You For Choosing BUJJI BAJJI
-// </h2>
-
-// <p>
-// Freshly Prepared • Hygienically Packed • Delivered With Love
-// </p>
-
-// </div>
-
-// </div>
-
-// </body>
-// </html>
-// `;
-
-//     await page.setContent(invoiceHtml, {
-//       waitUntil: "networkidle0"
-//     });
-//     await page.waitForSelector("img");
-// await page.waitForTimeout(5000);
-
-//     const pdf = await page.pdf({
-//       format: "A4",
-//       printBackground: true
-//     });
-
-//     await browser.close();
-
-//     res.setHeader(
-//       "Content-Type",
-//       "application/pdf"
-//     );
-
-//     res.setHeader(
-//       "Content-Disposition",
-//       `attachment; filename="Invoice-${order._id}.pdf"`
-//     );
-
-//     res.send(pdf);
-
-//   } catch (err) {
-
-//     console.log(err);
-
-//     res.status(500).send(err.message);
-
-//   }
-// });
+});
 app.get("/analytics", async (req, res) => {
 
   try {
@@ -3102,274 +2750,185 @@ onTheWayOrders
 
 });
 
-// app.post("/send-analytics-report", async (req, res) => {
+app.post("/send-analytics-report", async (req, res) => {
+
+  try {
+
+    const orders = await Order.find();
+
+    const totalOrders =
+      orders.length;
+
+    const revenue =
+      orders.reduce(
+        (sum, order) =>
+          sum + (order.total || 0),
+        0
+      );
+
+    const deliveredOrders =
+      orders.filter(
+        order =>
+          order.status === "Delivered ✅"
+      ).length;
+
+    const pendingOrders =
+      totalOrders - deliveredOrders;
+
+    const deliveryRate =
+      totalOrders > 0
+      ? (
+          (deliveredOrders / totalOrders)
+          * 100
+        ).toFixed(1)
+      : 0;
+
+    const reportHtml = `
+    <div style="
+      font-family:Arial;
+      max-width:700px;
+      margin:auto;
+      background:white;
+      padding:30px;
+      border-radius:20px;
+    ">
+
+      <div style="
+        background:#ea580c;
+        color:white;
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+      ">
+
+        <h1>
+          📊 BUJJI BAJJI Analytics Report
+        </h1>
+
+        <p>
+          ${new Date().toLocaleString()}
+        </p>
+
+      </div>
+
+      <div style="
+        margin-top:20px;
+        padding:15px;
+        background:#fafafa;
+        border-radius:12px;
+      ">
+        <h3>Total Orders</h3>
+        <h1>${totalOrders}</h1>
+      </div>
+
+      <div style="
+        margin-top:15px;
+        padding:15px;
+        background:#fafafa;
+        border-radius:12px;
+      ">
+        <h3>Total Revenue</h3>
+        <h1>₹${revenue}</h1>
+      </div>
+
+      <div style="
+        margin-top:15px;
+        padding:15px;
+        background:#fafafa;
+        border-radius:12px;
+      ">
+        <h3>Delivered Orders</h3>
+        <h1>${deliveredOrders}</h1>
+      </div>
+
+      <div style="
+        margin-top:15px;
+        padding:15px;
+        background:#fafafa;
+        border-radius:12px;
+      ">
+        <h3>Pending Orders</h3>
+        <h1>${pendingOrders}</h1>
+      </div>
+
+      <div style="
+        margin-top:15px;
+        padding:15px;
+        background:#fafafa;
+        border-radius:12px;
+      ">
+        <h3>Delivery Success Rate</h3>
+        <h1>${deliveryRate}%</h1>
+      </div>
 
-//   try {
-// const orders = await Order.find();
+    </div>
+    `;
 
-// const totalOrders =
-//   orders.length;
+    const response = await fetch(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        method: "POST",
 
-// const revenue =
-//   orders.reduce(
-//     (sum, order) =>
-//       sum + (order.total || 0),
-//     0
-//   );
+        headers: {
+          "accept": "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json"
+        },
 
-// const deliveredOrders =
-//   orders.filter(
-//     order =>
-//       order.status === "Delivered ✅"
-//   ).length;
+        body: JSON.stringify({
 
-// const pendingOrders =
-//   totalOrders - deliveredOrders;
+          sender: {
+            name: "BUJJI BAJJI",
+            email: "teruanudeep987@gmail.com"
+          },
 
-//   const deliveryRate =
-// totalOrders > 0
-// ? (
-//     (deliveredOrders / totalOrders)
-//     * 100
-//   ).toFixed(1)
-// : 0;
+          to: [
+            {
+              email: "teruanudeep987@gmail.com"
+            }
+          ],
 
-// const reportHtml = `
+          subject:
+            "📊 BUJJI BAJJI Analytics Report",
 
-// <!DOCTYPE html>
+          htmlContent:
+            reportHtml
 
-// <html>
+        })
 
-// <head>
+      }
+    );
 
-// <style>
+    const data =
+      await response.json();
 
-// body{
-// font-family:Arial;
-// padding:30px;
-// background:#f4f4f4;
-// }
+    console.log(
+      "ANALYTICS EMAIL:",
+      data
+    );
 
-// .report{
-// background:white;
-// padding:30px;
-// border-radius:20px;
-// box-shadow:0 0 15px rgba(0,0,0,.15);
-// }
+    res.json({
 
-// .header{
-// background:#ea580c;
-// color:white;
-// padding:20px;
-// border-radius:15px;
-// text-align:center;
-// }
+      success: true,
 
-// .card{
-// background:#fafafa;
-// padding:15px;
-// margin-top:15px;
-// border-radius:12px;
-// }
+      message:
+        "Analytics report emailed successfully"
 
-// .value{
-// font-size:28px;
-// font-weight:bold;
-// color:#ea580c;
-// }
+    });
 
-// </style>
+  }
 
-// </head>
+  catch (err) {
 
-// <body>
+    console.log(err);
 
-// <div class="report">
+    res.status(500).json({
+      success: false
+    });
 
-// <div class="header">
+  }
 
-// <h1>
-// 📊 BUJJI BAJJI
-// Analytics Report
-// </h1>
-
-// <p>
-// ${new Date().toLocaleString()}
-// </p>
-
-// </div>
-
-// <div class="card">
-
-// <h3>Total Orders</h3>
-
-// <div class="value">
-// ${totalOrders}
-// </div>
-
-// </div>
-
-// <div class="card">
-
-// <h3>Total Revenue</h3>
-
-// <div class="value">
-// ₹${revenue}
-// </div>
-
-// </div>
-
-// <div class="card">
-
-// <h3>Delivered Orders</h3>
-
-// <div class="value">
-// ${deliveredOrders}
-// </div>
-
-// </div>
-
-// <div class="card">
-
-// <h3>Pending Orders</h3>
-
-// <div class="value">
-// ${pendingOrders}
-// </div>
-
-// </div>
-
-// <div class="card">
-
-// <h3>Delivery Success Rate</h3>
-
-// <div class="value">
-// ${deliveryRate}%
-// </div>
-
-// </div>
-
-// </div>
-
-// </body>
-
-// </html>
-
-// `;
-// const browser =
-// await puppeteer.launch({
-
-//   headless: "new",
-
-//   args: [
-
-//     "--no-sandbox",
-
-//     "--disable-setuid-sandbox"
-
-//   ]
-
-// });
-
-// const page =
-// await browser.newPage();
-
-// await page.setContent(
-//   reportHtml,
-//   {
-//     waitUntil:
-//     "networkidle2"
-//   }
-// );
-
-// await page.waitForTimeout(
-//   1000
-// );
-
-// const pdfData =
-// await page.pdf({
-
-//   format: "A4",
-
-//   printBackground: true
-
-// });
-
-// await transporter.sendMail({
-
-//   from: process.env.EMAIL_USER,
-
-//   to: "teruanudeep987@gmail.com",
-
-//   subject:
-//   "📊 Bujji Bajji Analytics Report",
-
-//   html: `
-//   <h2>
-//   Analytics Report Generated
-//   </h2>
-
-//   <p>
-//   Attached is the latest analytics report.
-//   </p>
-//   `,
-
-//   attachments: [
-
-//     {
-
-//       filename:
-//       "Bujji-Bajji-Analytics.pdf",
-
-//       content: pdfData
-
-//     }
-
-//   ]
-
-// });
-
-// await browser.close();
-// const fs = require("fs");
-// const path = require("path");
-
-// // res.json({
-
-// //   success: true,
-
-// //   totalOrders,
-
-// //   revenue,
-
-// //   deliveredOrders,
-
-// //   pendingOrders
-
-// // });
-
-// res.json({
-
-//   success: true,
-
-//   message:
-//   "Analytics report emailed successfully"
-
-// });
-
-//   }
-
-//   catch (err) {
-
-//     console.log(err);
-
-//     res.status(500).json({
-//       success: false
-//     });
-
-//   }
-
-// });
-
+});
 app.put("/order/:id", async (req, res) => {
   const { status, user } = req.body;
 
