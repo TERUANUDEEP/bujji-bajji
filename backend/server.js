@@ -3210,82 +3210,112 @@ await order.save();
 // 🔑 RESET PASSWORD
 //// ✉️ Send notification email using Brevo
 app.post("/reset-password", async (req, res) => {
-try {
 
-  const resetEmail = {
+  try {
 
-    sender: {
-      name: "BUJJI BAJJI",
-      email: "teruanudeep987@gmail.com"
-    },
+    const { email, newPassword } = req.body;
 
-    to: [
-      {
-        email: req.body.email
-      }
-    ],
+    const user =
+      await User.findOne({ email });
 
-    subject:
-      "Your BUJJI BAJJI password has been changed",
+    if (!user) {
 
-    htmlContent: `
-      <h2>Password Changed Successfully ✅</h2>
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
 
-      <p>
-        Hello,
-      </p>
+    }
 
-      <p>
-        Your BUJJI BAJJI password was successfully changed.
-      </p>
+    const hashedPassword =
+      await bcrypt.hash(newPassword, 10);
 
-      <p>
-        If you did not request this change,
-        please contact support immediately.
-      </p>
+    user.password =
+      hashedPassword;
 
-      <br>
+    await user.save();
 
-      <p>
-        Thank you,
-        <br>
-        BUJJI BAJJI Team
-      </p>
-    `
-  };
+    const resetEmail = {
 
-  const response =
-    await fetch(
+      sender: {
+        name: "BUJJI BAJJI",
+        email: "teruanudeep987@gmail.com"
+      },
+
+      to: [
+        {
+          email: user.email
+        }
+      ],
+
+      subject:
+        "Your BUJJI BAJJI password has been changed",
+
+      htmlContent: `
+        <h2>Password Changed Successfully ✅</h2>
+
+        <p>Your password was changed successfully.</p>
+
+        <p>
+          If you did not make this change,
+          contact support immediately.
+        </p>
+      `
+    };
+
+    const response = await fetch(
       "https://api.brevo.com/v3/smtp/email",
       {
         method: "POST",
+
         headers: {
           "accept": "application/json",
           "api-key": process.env.BREVO_API_KEY,
           "content-type": "application/json"
         },
+
         body: JSON.stringify(resetEmail)
       }
     );
 
-  const data = await response.json();
+    const data =
+      await response.json();
 
-  console.log(
-    "PASSWORD RESET EMAIL:",
-    data
-  );
+    console.log(
+      "PASSWORD RESET EMAIL:",
+      data
+    );
 
-}
+    return res.json({
 
-catch (mailErr) {
+      success: true,
 
-  console.log(
-    "Password reset email failed:",
-    mailErr
-  );
+      message:
+        "Password updated successfully"
 
-}});
+    });
 
+  }
+
+  catch (err) {
+
+    console.log(
+      "RESET PASSWORD ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        "Server error"
+
+    });
+
+  }
+
+});
 
 app.get("/users", async (req, res) => {
   try {
