@@ -7,6 +7,9 @@ const ADMINS = [
 const nodemailer = require("nodemailer");
 const brevo = require("@getbrevo/brevo");
 
+console.log("BREVO OBJECT:");
+console.log(brevo);
+
 const puppeteer = require("puppeteer");
 const QRCode = require("qrcode");
 const path = require("path");
@@ -181,8 +184,6 @@ const Item = mongoose.model("Item", ItemSchema);
 const Feedback = mongoose.model("Feedback", FeedbackSchema);
 console.log("BREVO_USER =", process.env.BREVO_USER);
 console.log("BREVO_PASS exists =", !!process.env.BREVO_PASS);
-
-const apiInstance = new brevo.TransactionalEmailsApi();
 
 apiInstance.setApiKey(
   brevo.TransactionalEmailsApiApiKeys.apiKey,
