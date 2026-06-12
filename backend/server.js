@@ -3598,75 +3598,68 @@ app.post("/verify-email-otp", (req, res) => {
 
 app.post("/send-delivery-otp", async (req, res) => {
 
+  console.log("SEND OTP HIT");
+
   try {
 
     const { orderId } = req.body;
 
-    const order =
-      await Order.findById(orderId);
+    console.log("ORDER ID:", orderId);
+
+    const order = await Order.findById(orderId);
+
+    console.log("ORDER FOUND:", !!order);
 
     if (!order) {
-
       return res.status(404).json({
-        success: false,
-        message: "Order not found"
+        success:false,
+        message:"Order not found"
       });
-
     }
+
+    console.log("EMAIL:", order.user);
 
     const otp =
       Math.floor(
-        100000 +
-        Math.random() * 900000
+        100000 + Math.random() * 900000
       ).toString();
 
-    order.deliveryOtp =
-      otp;
+    console.log("OTP GENERATED");
 
-    order.otpVerified =
-      false;
+    order.deliveryOtp = otp;
 
     await order.save();
 
+    console.log("ORDER SAVED");
+
+    console.log("ABOUT TO SEND EMAIL");
+
     await transporter.sendMail({
-
-      from:
-      process.env.EMAIL_USER,
-
-      to:
-      order.user,
-
-      subject:
-      "BUJJI BAJJI Delivery OTP",
-
-      text:
-`Your delivery OTP is:
-
-${otp}
-
-Please share this OTP with the delivery rider only after receiving your order.`
-
+      from: process.env.EMAIL_USER,
+      to: order.user,
+      subject: "BUJJI BAJJI Delivery OTP",
+      text: `Your OTP is ${otp}`
     });
+
+    console.log("EMAIL SENT");
 
     res.json({
-      success: true,
-      message: "Delivery OTP sent"
+      success:true,
+      message:"Delivery OTP sent"
     });
 
-  }
+  } catch(err) {
 
-  catch (err) {
-
+    console.log("OTP ERROR:");
     console.log(err);
 
     res.status(500).json({
-      success: false
+      success:false
     });
 
   }
 
 });
-
 
 app.post("/verify-delivery-otp", async (req, res) => {
 
