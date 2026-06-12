@@ -178,19 +178,18 @@ const User = mongoose.model("User", UserSchema);
 const Order = mongoose.model("Order", OrderSchema);
 const Item = mongoose.model("Item", ItemSchema);
 const Feedback = mongoose.model("Feedback", FeedbackSchema);
-console.log("EMAIL_USER =", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists =", !!process.env.EMAIL_PASS);
+console.log("BREVO_USER =", process.env.BREVO_USER);
+console.log("BREVO_PASS exists =", !!process.env.BREVO_PASS);
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS
   }
 });
-
 transporter.verify((error, success) => {
   if (error) {
     console.log("SMTP ERROR:", error);
