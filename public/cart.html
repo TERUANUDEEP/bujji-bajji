@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart - BUJJI BAJJI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Outfit', sans-serif;
+    animation: fadeIn 0.5s ease-in;
+    background: transparent;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-in forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  .glass-card {
+    background: rgba(8,8,8,0.55);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .brand-text {
+    font-family: 'DIMSUM', 'Arial Black', sans-serif;
+  }
+
+  .cart-title {
+    font-family: 'DM Sans', sans-serif;
+  }
+</style>
+</head>
+
+<body class="bg-transparent text-white">
+
+  <!-- 🎥 Background Video -->
+  <video autoplay muted loop preload="auto" class="fixed inset-0 w-full h-full object-cover -z-10 brightness-75">
+    <source src="background.mp4" type="video/mp4">
+  </video>
+
+  <!-- 🌫 Overlay -->
+  <div class="fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-black/50 pointer-events-none -z-10"></div>
+
+  <!-- 🔥 NAVBAR -->
+  <header id="topNavbar" class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" class="w-14 h-14 rounded-full object-cover border-2 border-orange-400 shadow-xl shadow-orange-500/30">
+        <h1 class="text-3xl font-black uppercase tracking-wider text-orange-400 brand-text">BUJJI BAJJI</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="window.location.href='index.html'" class="px-6 py-2 rounded-full bg-orange-500 text-black font-semibold hover:bg-orange-600">← Back to Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="mx-auto max-w-7xl px-4 pb-32 pt-8">
+    <h1 class="text-4xl font-black uppercase text-orange-400 mb-8 cart-title">🛒 Your Cart</h1>
+
+    <!-- CART CONTAINER -->
+    <div class="glass-card rounded-3xl border border-white/10 p-8">
+      <div id="cartItems" class="space-y-4 mb-6"></div>
+      <div id="total" class="text-2xl font-bold text-orange-300 border-t border-white/10 pt-6 mb-6"></div>
+
+      <div class="flex flex-wrap gap-4">
+       <button
+onclick="goToCheckout()"
+class="rounded-full bg-green-500 px-6 py-3 font-semibold text-white">
+
+  ✅ Checkout
+
+</button>
+
+ <button onclick="window.location.href='index.html'" class="rounded-full bg-orange-500 px-6 py-3 font-semibold text-black hover:bg-orange-600 transition">
+          ← Continue Shopping
+        </button>
+        <button onclick="clearCart()" class="rounded-full bg-red-500 px-6 py-3 font-semibold text-white hover:bg-red-600 transition">
+          🗑️ Clear Cart
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-white/10 z-40">
+    <div class="max-w-7xl mx-auto flex items-center justify-around px-4 py-3 text-slate-900">
+      <a href="index.html" class="font-bold">🏠 Home</a>
+      <a href="cart.html" class="font-bold text-orange-500">🛒 Cart</a>
+      <a href="history.html">📜 History</a>
+      <a href="feedback.html">📸 Feedback</a>
+      <a href="favourites.html">❤️ Favorites</a>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    function clearCart() {
+      if (confirm("Clear entire cart? 🤔")) {
+        localStorage.removeItem("cart");
+        loadCart();
+        showToast("Cart cleared ✨");
+      }
+    }
+
+    window.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    protectPage();
+
+    loadCart();
+
+    updateCartCount();
+
+  }
+);
+
+    function goToCheckout() {
+
+  let cart =
+    JSON.parse(
+      localStorage.getItem("cart")
+    ) || [];
+
+  if (cart.length === 0) {
+
+    showToast(
+      "Your cart is empty 🛒"
+    );
+
+    return;
+
+  }
+
+  window.location.href =
+    "checkout.html";
+
+}
+function showToast(
+
+  message,
+
+  type = "success"
+
+) {
+
+  const toast =
+
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    message;
+
+  toast.className =
+
+    `fixed top-5 right-5 z-50 rounded-2xl px-6 py-4 text-white font-bold shadow-2xl
+
+    ${
+
+      type === "success"
+
+      ?
+
+      "bg-green-500"
+
+      :
+
+      "bg-red-500"
+
+    }`;
+
+  toast.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(() => {
+
+    toast.classList.add(
+      "hidden"
+    );
+
+  }, 2500);
+
+}
+
+  </script>
+  <div
+
+id="toast"
+
+class="fixed top-5 right-5 z-50 hidden rounded-2xl bg-green-500 px-6 py-4 text-white font-bold shadow-2xl">
+
+</div>
+<audio
+id="globalMusic"
+loop>
+
+<source
+src="default-music.mp3"
+type="audio/mpeg">
+
+</audio>
+
+<script src="music.js"></script>
+</body>
+</html>
